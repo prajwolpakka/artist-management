@@ -1,5 +1,8 @@
-const App = () => {
-	return <div className="bg-slate-800 font-black text-white p-4">Hello Tailwind CSS!</div>;
+import { RouterProvider } from "react-router-dom";
+import { router } from "./router";
+
+const App: React.FC = () => {
+	return <RouterProvider router={router} />;
 };
 
 export default App;
