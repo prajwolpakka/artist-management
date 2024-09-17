@@ -1,16 +1,13 @@
 import { Logo } from "components/logo";
 import { NavBar, NavItem } from "components/navbar";
 import { Outlet } from "react-router-dom";
+import { logout } from "services/authentication";
 
 interface Props {
 	navItems: NavItem[];
 }
 
 const DashboardLayout: React.FC<Props> = ({ navItems }) => {
-	const logout = () => {
-		// TODO: Handle Logout
-	};
-
 	return (
 		<div className="flex flex-col h-screen">
 			<header className="bg-[#252B37] h-[54px] px-5 flex justify-between items-center">

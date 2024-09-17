@@ -1,4 +1,5 @@
 import axios from "axios";
+import { store } from "store/store";
 
 export const http = axios.create({
 	baseURL: "http://localhost:3000",
@@ -24,6 +25,7 @@ http.interceptors.response.use(
 			localStorage.removeItem("token");
 			localStorage.removeItem("role");
 			localStorage.setItem("isAuthenticated", "false");
+			store.dispatch({ type: "auth/resetAuthenticated" });
 		}
 		return Promise.reject(error);
 	}

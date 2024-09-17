@@ -1,3 +1,4 @@
+import { store } from "store/store";
 import { http } from "../utils/http";
 
 export interface LoginProps {
@@ -12,8 +13,10 @@ export async function login(data: LoginProps) {
 		localStorage.setItem("token", accessToken);
 		localStorage.setItem("role", role);
 		localStorage.setItem("isAuthenticated", "true");
+		store.dispatch({ type: "auth/setAuthenticated" });
 		return response.data;
 	} catch (err: any) {
+		store.dispatch({ type: "auth/resetAuthenticated" });
 		return { error: err.response?.data?.error || "An unknown error occurred" };
 	}
 }
@@ -47,4 +50,5 @@ export function logout() {
 	localStorage.removeItem("token");
 	localStorage.removeItem("role");
 	localStorage.removeItem("isAuthenticated");
+	store.dispatch({ type: "auth/resetAuthenticated" });
 }
