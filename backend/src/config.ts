@@ -5,6 +5,8 @@ import { z } from "zod";
 dotenv.config({ path: path.join(__dirname, "../.env") });
 
 const environmentSchema = z.object({
+	ACCESS_TOKEN_SECRET: z.string().min(64),
+
 	DB_HOST: z.string().min(1, "DB_HOST is required"),
 	DB_USER: z.string().min(1, "DB_USER is required"),
 	DB_PASSWORD: z.string().min(1, "DB_PASSWORD is required"),

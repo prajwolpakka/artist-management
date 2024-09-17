@@ -5,22 +5,28 @@
 	"main": "index.ts",
 	"scripts": {
 		"dev": "nodemon ./src/index.ts",
+		"new:table": "fn(){ npx knex migrate:make --knexfile ./src/db.ts --stub ./stubs/createTable.stub.ts create_$1_table | grep -i \"Created Migration\" | awk -F' ' '{ print $3}' | xargs -iPATH  sed -i \"s/TABLE_NAME/$1/g\" PATH ;}; fn",
+		"new:alter": "fn(){ npx knex migrate:make --knexfile ./src/db.ts --stub ./stubs/alterTable.stub.ts alter_$1_table | grep -i \"Created Migration\" | awk -F' ' '{ print $3}' | xargs -iPATH  sed -i \"s/TABLE_NAME/$1/g\" PATH ;}; fn",
+		"migrate": "npx knex migrate:latest --knexfile ./src/db.ts",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"keywords": [],
 	"author": "Prajwol Pakka",
 	"license": "MIT",
 	"dependencies": {
+		"bcrypt": "^5.1.1",
 		"body-parser": "^1.20.3",
 		"cors": "^2.8.5",
 		"dotenv": "^16.4.5",
 		"express": "^4.21.0",
 		"helmet": "^7.1.0",
+		"jose": "^5.9.2",
 		"knex": "^3.1.0",
 		"mysql2": "^3.11.3",
 		"zod": "^3.23.8"
 	},
 	"devDependencies": {
+		"@types/bcrypt": "^5.0.2",
 		"@types/cors": "^2.8.17",
 		"@types/express": "^4.17.21",
 		"@types/knex": "^0.16.1",
