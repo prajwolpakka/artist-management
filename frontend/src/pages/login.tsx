@@ -1,21 +1,24 @@
 import { ErrorMessage, Field, Form, Formik, FormikHelpers } from "formik";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { login, LoginProps } from "services/authentication";
 import * as Yup from "yup";
 
-interface LoginFormValues {
-	email: string;
-	password: string;
-}
-
 const LoginPage = () => {
+	const navigate = useNavigate();
+
 	const validationSchema = Yup.object({
 		email: Yup.string().email("Invalid email address").required("* Required"),
 		password: Yup.string().required("* Required"),
 	});
 
-	const handleSubmit = async (values: LoginFormValues, { setSubmitting }: FormikHelpers<LoginFormValues>) => {
-		console.log(values); // TODO: Replace with API call to authenticate user
+	const handleSubmit = async (values: LoginProps, { setSubmitting }: FormikHelpers<LoginProps>) => {
+		const data = await login(values);
 		setSubmitting(false);
+		if (data.error) toast.error(data.error);
+		else {
+			navigate("/");
+		}
 	};
 
 	return (

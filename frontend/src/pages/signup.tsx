@@ -1,20 +1,12 @@
 import { ErrorMessage, Field, Form, Formik, FormikHelpers } from "formik";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { signUp, SignupProps } from "services/authentication";
 import * as Yup from "yup";
 
-interface SignupFormValues {
-	first_name: string;
-	last_name: string;
-	email: string;
-	password: string;
-	phone: string;
-	dob: string;
-	gender: string;
-	address: string;
-	role: string;
-}
-
 const SignupPage = () => {
+	const navigate = useNavigate();
+
 	const validationSchema = Yup.object({
 		first_name: Yup.string().required("* Required"),
 		last_name: Yup.string().required("* Required"),
@@ -24,12 +16,17 @@ const SignupPage = () => {
 		dob: Yup.string().required("* Required"),
 		gender: Yup.string().required("* Required"),
 		address: Yup.string().required("* Required"),
-		role: Yup.string().required("* Required"),
 	});
 
-	const handleSubmit = async (values: SignupFormValues, { setSubmitting }: FormikHelpers<SignupFormValues>) => {
-		console.log(values); // TODO: Replace with API call to register user
+	const handleSubmit = async (values: SignupProps, { setSubmitting }: FormikHelpers<SignupProps>) => {
+		const data = await signUp(values);
 		setSubmitting(false);
+		if (data.error) {
+			toast.error(data.error);
+		} else {
+			toast.success("Signup Successful.");
+			navigate("/login");
+		}
 	};
 
 	return (
@@ -46,7 +43,6 @@ const SignupPage = () => {
 						dob: "",
 						gender: "",
 						address: "",
-						role: "",
 					}}
 					validationSchema={validationSchema}
 					onSubmit={handleSubmit}
@@ -107,20 +103,20 @@ const SignupPage = () => {
 								<ErrorMessage name="password" component="div" className="text-red-500 text-xs mt-1" />
 							</div>
 
-							<div className="grid grid-cols-2 gap-4 mb-3">
-								{/* Phone */}
-								<div>
-									<label htmlFor="phone" className="block text-gray-700 text-sm mb-1">
-										Phone
-									</label>
-									<Field
-										name="phone"
-										type="text"
-										className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
-									/>
-									<ErrorMessage name="phone" component="div" className="text-red-500 text-xs mt-1" />
-								</div>
+							{/* Phone */}
+							<div className="mb-3">
+								<label htmlFor="phone" className="block text-gray-700 text-sm mb-1">
+									Phone
+								</label>
+								<Field
+									name="phone"
+									type="text"
+									className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
+								/>
+								<ErrorMessage name="phone" component="div" className="text-red-500 text-xs mt-1" />
+							</div>
 
+							<div className="grid grid-cols-2 gap-4 mb-3">
 								{/* Date of Birth */}
 								<div>
 									<label htmlFor="dob" className="block text-gray-700 text-sm mb-1">
@@ -133,9 +129,7 @@ const SignupPage = () => {
 									/>
 									<ErrorMessage name="dob" component="div" className="text-red-500 text-xs mt-1" />
 								</div>
-							</div>
 
-							<div className="grid grid-cols-2 gap-4 mb-3">
 								{/* Gender */}
 								<div>
 									<label htmlFor="gender" className="block text-gray-700 text-sm mb-1">
@@ -152,24 +146,6 @@ const SignupPage = () => {
 										<option value="o">Other</option>
 									</Field>
 									<ErrorMessage name="gender" component="div" className="text-red-500 text-xs mt-1" />
-								</div>
-
-								{/* Role */}
-								<div>
-									<label htmlFor="role" className="block text-gray-700 text-sm mb-1">
-										Role
-									</label>
-									<Field
-										as="select"
-										name="role"
-										className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
-									>
-										<option value="">Select Role</option>
-										<option value="super_admin">Super Admin</option>
-										<option value="artist_manager">Artist Manager</option>
-										<option value="artist">Artist</option>
-									</Field>
-									<ErrorMessage name="role" component="div" className="text-red-500 text-xs mt-1" />
 								</div>
 							</div>
 
