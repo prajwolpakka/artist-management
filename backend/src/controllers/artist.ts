@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { AutheniticatedRequest } from "../middlewares/authentication";
+import { getArtistById, updateArtist } from "../models/artist";
 import {
 	createNewUser,
 	deleteUserById,
@@ -10,8 +11,9 @@ import {
 	searchUserArtists,
 } from "../models/user";
 import { hashPassword } from "../services/encryption";
+import { Artist } from "../types/artist";
 import { UserArtist } from "../types/user";
-import { userArtistSchema } from "../validators/users";
+import { updateArtistSchema, userArtistSchema } from "../validators/users";
 import { maskPrivateUserData, sendUserAlreadyExists } from "./user";
 
 export async function createArtist(req: AutheniticatedRequest<Omit<UserArtist, "id">>, res: Response) {
@@ -103,4 +105,32 @@ export async function searchArtists(req: Request, res: Response) {
 		console.error("Error searching artists:", error);
 		return res.status(500).send({ error: "Internal Server Error" });
 	}
+}
+
+export async function updateArtistData(req: AutheniticatedRequest<Artist>, res: Response) {
+	const id = req.params.id;
+
+	if (!id) {
+		return res.status(400).send({ error: "ID is required" });
+	}
+
+	const { data } = req.body;
+
+	const userProfile = getArtistById(id);
+	if (!userProfile) {
+		return res.status(404).send({
+			error: "Artist not found",
+		});
+	}
+
+	try {
+		updateArtistSchema.parse(data);
+	} catch (err) {
+		return res.status(400).send({ errors: err });
+	}
+
+	await updateArtist(id, data as Artist);
+	return res.status(201).send({
+		message: "User updated successfully",
+	});
 }

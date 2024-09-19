@@ -75,12 +75,32 @@ export const getUsers = async (limit: number, offset: number, type?: "super_admi
 	if (type === "artist") {
 		query = query
 			.leftJoin("artist", "artist.user_id", "user.id")
-			.select("user.*", "artist.*", db.raw(`COALESCE(artist.updated_at, user.updated_at) as updated_at`));
+			.select(
+				"user.*",
+				"artist.id as artist_id",
+				"artist.name as name",
+				"artist.dob as dob",
+				"artist.gender as gender",
+				"artist.address as address",
+				"artist.first_release_year as first_release_year",
+				"artist.no_of_albums_released as no_of_albums_released",
+				db.raw(`COALESCE(artist.updated_at, user.updated_at) as updated_at`)
+			);
 		return query.where("user.role", type);
 	} else if (type === "super_admin" || type === "artist_manager") {
 		query = query
 			.leftJoin("profile", "profile.user_id", "user.id")
-			.select("user.*", "profile.*", db.raw(`COALESCE(profile.updated_at, user.updated_at) as updated_at`));
+			.select(
+				"user.*",
+				"profile.id as profile_id",
+				"profile.first_name as first_name",
+				"profile.last_name as last_name",
+				"profile.phone as phone",
+				"profile.dob as dob",
+				"profile.gender as gender",
+				"profile.address as address",
+				db.raw(`COALESCE(profile.updated_at, user.updated_at) as updated_at`)
+			);
 		return query.where("user.role", type);
 	} else {
 		query = query
