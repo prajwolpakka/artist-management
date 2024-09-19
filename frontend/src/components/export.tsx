@@ -43,7 +43,11 @@ const CSVExport: React.FC = () => {
 	};
 
 	return (
-		<button onClick={downloadCSV} className="flex items-center rounded-md px-3 py-2 text-sm border" disabled={loading}>
+		<button
+			onClick={downloadCSV}
+			className="flex items-center rounded-md px-3 py-2 text-sm border hover:border-blue-500 hover:text-blue-500 "
+			disabled={loading}
+		>
 			{loading ? (
 				<div className="animate-spin border-2 border-t-transparent border-gray-300 rounded-full w-4 h-4 my-auto" />
 			) : (
