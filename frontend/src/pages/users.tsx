@@ -89,8 +89,8 @@ const UsersPage: React.FC = () => {
 						<thead className="sticky top-0 bg-gray-100 z-10">
 							<tr className="border-b">
 								<th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Name</th>
-								<th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Gender</th>
 								<th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Email</th>
+								<th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Gender</th>
 								<th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Role</th>
 								<th className="px-6 py-3 text-center text-sm font-semibold text-gray-600">Actions</th>
 							</tr>
@@ -101,10 +101,10 @@ const UsersPage: React.FC = () => {
 									<td className="px-6 py-2 text-sm text-gray-800">
 										{isUserArtist(user) ? user.name : `${user.first_name} ${user.last_name}`}
 									</td>
+									<td className="px-6 py-2 text-sm text-gray-800">{user.email}</td>
 									<td className="px-6 py-2 text-sm text-gray-800">
 										{user.gender === "m" ? "Male" : user.gender === "f" ? "Female" : "Other"}
 									</td>
-									<td className="px-6 py-2 text-sm text-gray-800">{user.email}</td>
 									<td className="px-6 py-2 text-sm text-gray-800">{properCase(user.role.replace("_", " "))}</td>
 									<td className="px-6 py-2 gap-4 flex justify-center items-center">
 										<button

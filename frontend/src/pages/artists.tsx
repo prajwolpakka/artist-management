@@ -82,8 +82,8 @@ const ArtistsPage: React.FC = () => {
 						<thead className="sticky top-0 bg-gray-100 z-10">
 							<tr className="border-b">
 								<th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Name</th>
-								<th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Date of Birth</th>
-								<th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Address</th>
+								<th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Email</th>
+								<th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Gender</th>
 								<th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">First Release Year</th>
 								<th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Total Albums Released</th>
 								<th className="px-6 py-3 text-center text-sm font-semibold text-gray-600">Actions</th>
@@ -93,8 +93,10 @@ const ArtistsPage: React.FC = () => {
 							{artists.map((artist) => (
 								<tr key={artist.id} className="hover:bg-gray-50 transition-all">
 									<td className="px-6 py-2 text-sm text-gray-800">{artist.name}</td>
-									<td className="px-6 py-2 text-sm text-gray-800">{new Date(artist.dob).toLocaleDateString()}</td>
-									<td className="px-6 py-2 text-sm text-gray-800">{artist.address}</td>
+									<td className="px-6 py-2 text-sm text-gray-800">{artist.email}</td>
+									<td className="px-6 py-2 text-sm text-gray-800">
+										{artist.gender === "m" ? "Male" : artist.gender === "f" ? "Female" : "Other"}
+									</td>
 									<td className="px-6 py-2 text-sm text-gray-800">{artist.first_release_year}</td>
 									<td className="px-6 py-2 text-sm text-gray-800">{artist.no_of_albums_released}</td>
 									<td className="px-6 py-2 gap-4 flex justify-center items-center">
