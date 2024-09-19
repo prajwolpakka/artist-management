@@ -13,7 +13,7 @@ export async function login(data: LoginProps) {
 		localStorage.setItem("token", accessToken);
 		localStorage.setItem("role", role);
 		localStorage.setItem("isAuthenticated", "true");
-		store.dispatch({ type: "auth/setAuthenticated" });
+		store.dispatch({ type: "auth/setAuthenticated", payload: role });
 		return response.data;
 	} catch (err: any) {
 		store.dispatch({ type: "auth/resetAuthenticated" });
