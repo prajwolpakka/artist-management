@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { AutheniticatedRequest } from "../middlewares/authentication";
-import { createNewUser, getTotalUsers, getUserByEmail, getUsers } from "../models/user";
+import { createNewUser, deleteUserById, getTotalUsers, getUserByEmail, getUsers } from "../models/user";
 import { hashPassword } from "../services/encryption";
 import { UserArtist, UserArtistManager, UserSuperAdmin } from "../types/user";
 import { userArtistManagerSchema, userArtistSchema, userSuperAdminSchema } from "../validators/users";
@@ -83,3 +83,24 @@ export async function createUser(
 		message: "User created successfully",
 	});
 }
+
+export const deleteUser = async (req: Request, res: Response) => {
+	const id = req.params.id;
+
+	if (!id) {
+		return res.status(400).send({ error: "ID is required" });
+	}
+
+	try {
+		const result = await deleteUserById(id);
+
+		if (!result) {
+			return res.status(404).send({ error: "User not found" });
+		}
+
+		res.status(200).send({ message: "User deleted successfully" });
+	} catch (error) {
+		console.error(error);
+		res.status(500).send("Internal Server Error");
+	}
+};

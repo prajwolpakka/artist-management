@@ -75,3 +75,22 @@ export const getUsers = (limit: number, offset: number) => {
 export const getTotalUsers = () => {
 	return db("user").count("* as total").first();
 };
+
+/**
+ * Delete a user by their ID
+ * @param id - ID of the user
+ * @returns A boolean indicating success or failure
+ */
+export async function deleteUserById(id: string): Promise<boolean> {
+	await db.transaction(async (trx) => {
+		await trx("artist").where("user_id", id).del();
+		await trx("profile").where("user_id", id).del();
+
+		const result = await trx("user").where("id", id).del();
+		if (result === 0) {
+			// User not found
+			return false;
+		}
+	});
+	return true;
+}
