@@ -6,6 +6,7 @@ export interface User {
 
 export interface UserSuperAdmin extends User {
 	role: "super_admin";
+	profile_id: number;
 	first_name: string;
 	last_name: string;
 	phone: string;
@@ -16,6 +17,7 @@ export interface UserSuperAdmin extends User {
 
 export interface UserArtistManager extends User {
 	role: "artist_manager";
+	profile_id: number;
 	first_name: string;
 	last_name: string;
 	phone: string;
@@ -26,6 +28,7 @@ export interface UserArtistManager extends User {
 
 export interface UserArtist extends User {
 	role: "artist";
+	artist_id: number;
 	name: string;
 	dob: Date;
 	gender: "m" | "f" | "o";

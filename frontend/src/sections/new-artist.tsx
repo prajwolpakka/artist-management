@@ -2,7 +2,7 @@ import { ErrorMessage, Field, Form, Formik, FormikHelpers } from "formik";
 import { properCase } from "helpers/properCase";
 import { toast } from "react-toastify";
 import { createArtist } from "services/artists";
-import { artistSchema } from "validators/users";
+import { createArtistSchema } from "validators/users";
 
 export interface NewArtistProps {
 	mode: "EDIT" | "CREATE";
@@ -32,7 +32,7 @@ const InputField = ({ label, name, type = "text" }: { label: string; name: strin
 export const NewArtist: React.FC<NewArtistProps> = (props) => {
 	const { mode, onSuccess } = props;
 
-	const validationSchema = artistSchema;
+	const validationSchema = createArtistSchema;
 
 	const handleSubmit = async (values: any, { setSubmitting }: FormikHelpers<any>) => {
 		const data = await createArtist(values);

@@ -1,15 +1,14 @@
 import * as Yup from "yup";
 
-const baseSchema = {
+const credentialsSchema = {
 	email: Yup.string().email("* Invalid email address").required("* Required"),
 	password: Yup.string().required("* Required").min(6, "Password should be longer than 6 digits"),
+};
+
+const artistSchemaFields = {
 	dob: Yup.date().required("* Required"),
 	gender: Yup.string().required("* Required"),
 	address: Yup.string().required("* Required"),
-};
-
-export const artistSchema = Yup.object({
-	...baseSchema,
 	role: Yup.string().oneOf(["artist"]).required("* Required"),
 	name: Yup.string().required("* Required"),
 	first_release_year: Yup.number()
@@ -21,20 +20,32 @@ export const artistSchema = Yup.object({
 		.required("* Required")
 		.positive("* Must be a positive number")
 		.integer("* Must be a whole number"),
+};
+
+export const createArtistSchema = Yup.object({
+	...credentialsSchema,
+	...artistSchemaFields,
 });
 
-export const adminSchema = Yup.object({
-	...baseSchema,
+export const updateArtistSchema = Yup.object({
+	...artistSchemaFields,
+});
+
+const adminSchemaFields = {
+	dob: Yup.date().required("* Required"),
+	gender: Yup.string().required("* Required"),
+	address: Yup.string().required("* Required"),
 	role: Yup.string().oneOf(["super_admin"]).required("* Required"),
 	first_name: Yup.string().required("* Required"),
 	last_name: Yup.string().required("* Required"),
 	phone: Yup.string().required("* Required"),
+};
+
+export const createAdminSchema = Yup.object({
+	...credentialsSchema,
+	...adminSchemaFields,
 });
 
-export const artistManagerSchema = Yup.object({
-	...baseSchema,
-	role: Yup.string().oneOf(["artist_manager"]).required("* Required"),
-	first_name: Yup.string().required("* Required"),
-	last_name: Yup.string().required("* Required"),
-	phone: Yup.string().required("* Required"),
+export const updateAdminSchema = Yup.object({
+	...adminSchemaFields,
 });

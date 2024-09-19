@@ -1,17 +1,29 @@
 import { ErrorMessage, Field, Form, Formik, FormikHelpers } from "formik";
+import { formatDateTimeToYMD } from "helpers/format-date";
 import { properCase } from "helpers/properCase";
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { createUser } from "services/users";
-import { adminSchema, artistManagerSchema, artistSchema } from "validators/users";
+import { createUser, updateUser } from "services/users";
+import { isUserArtist, UserWithDetails } from "types/user";
+import { createAdminSchema, createArtistSchema, updateAdminSchema, updateArtistSchema } from "validators/users";
 
 export interface NewUserProps {
 	mode: "EDIT" | "CREATE";
 	onSuccess: () => void;
-	user?: any;
+	user?: UserWithDetails;
 }
 
-const InputField = ({ label, name, type = "text" }: { label: string; name: string; type?: string }) => (
+const InputField = ({
+	label,
+	name,
+	type = "text",
+	disabled = false,
+}: {
+	label: string;
+	name: string;
+	type?: string;
+	disabled?: boolean;
+}) => (
 	<div>
 		<div className="flex items-center">
 			<label className="w-1/4 text-sm text-gray-700">{label}</label>
@@ -19,7 +31,10 @@ const InputField = ({ label, name, type = "text" }: { label: string; name: strin
 				<Field
 					name={name}
 					type={type}
-					className="w-full py-1 px-2 border border-gray-300 rounded-md focus:outline-blue-500"
+					disabled={disabled}
+					className={`w-full py-1 px-2 border border-gray-300 rounded-md focus:outline-blue-500 ${
+						disabled ? "bg-gray-100 cursor-not-allowed" : ""
+					}`}
 				/>
 			</div>
 		</div>
@@ -31,19 +46,40 @@ const InputField = ({ label, name, type = "text" }: { label: string; name: strin
 );
 
 export const NewUser: React.FC<NewUserProps> = (props) => {
-	const { mode, onSuccess } = props;
-	const [role, setRole] = useState<string>("super_admin");
+	const { mode, onSuccess, user } = props;
+	const [role, setRole] = useState<string>(user?.role ?? "super_admin");
 
-	const validationSchema =
-		role === "super_admin" ? adminSchema : role === "artist_manager" ? artistManagerSchema : artistSchema;
+	const addValidationSchema = role === "artist" ? createArtistSchema : createAdminSchema;
+	const editValidationSchema = role === "artist" ? updateArtistSchema : updateAdminSchema;
+
+	const validationSchema = mode === "CREATE" ? addValidationSchema : editValidationSchema;
+
+	const defaultValues = {
+		role,
+		email: "",
+		password: "",
+		firstName: "",
+		lastName: "",
+		phone: "",
+		dob: "",
+		gender: "m",
+		address: "",
+		name: "",
+		first_release_year: "",
+		no_of_albums_released: "",
+	};
 
 	const handleSubmit = async (values: any, { setSubmitting }: FormikHelpers<any>) => {
-		const data = await createUser(values);
+		const data =
+			mode === "CREATE"
+				? await createUser(values)
+				: await updateUser(values, isUserArtist(user!) ? user!.artist_id : user!.profile_id);
+
 		setSubmitting(false);
 		if (data.error) {
 			toast.error(data.error);
 		} else {
-			toast.success("User created successfully.");
+			toast.success(data.message);
 			onSuccess();
 		}
 	};
@@ -58,47 +94,35 @@ export const NewUser: React.FC<NewUserProps> = (props) => {
 	return (
 		<div className="flex flex-col items-center">
 			<Formik
-				initialValues={{
-					email: "",
-					password: "",
-					role: "artist_manager",
-					firstName: "",
-					lastName: "",
-					phone: "",
-					dob: "",
-					gender: "m",
-					address: "",
-					name: "",
-					first_release_year: "",
-					no_of_albums_released: "",
-				}}
+				initialValues={mode === "EDIT" ? { ...user, dob: formatDateTimeToYMD(user?.dob) } : defaultValues}
 				validationSchema={validationSchema}
 				onSubmit={handleSubmit}
 			>
 				{({ isSubmitting, setFieldValue }) => (
 					<Form className="w-full grid grid-cols-1 gap-3">
-						<div className="flex items-center">
-							<label className="w-1/4 text-sm text-gray-700">Role</label>
-							<div className="flex space-x-5">
-								{["super_admin", "artist_manager", "artist"].map((roleOption) => (
-									<label key={roleOption} className="flex items-center cursor-pointer space-x-1">
-										<Field
-											type="radio"
-											name="role"
-											value={roleOption}
-											checked={role === roleOption}
-											onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleRoleChange(e, setFieldValue)}
-											className="form-radio text-blue-500"
-										/>
-										<span>{properCase(roleOption.replace("_", " "))}</span>
-									</label>
-								))}
+						{mode === "CREATE" && (
+							<div className="flex items-center">
+								<label className="w-1/4 text-sm text-gray-700">Role</label>
+								<div className="flex space-x-5">
+									{["super_admin", "artist_manager", "artist"].map((roleOption) => (
+										<label key={roleOption} className="flex items-center cursor-pointer space-x-1">
+											<Field
+												type="radio"
+												name="role"
+												value={roleOption}
+												checked={role === roleOption}
+												onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleRoleChange(e, setFieldValue)}
+												className="form-radio text-blue-500"
+											/>
+											<span>{properCase(roleOption.replace("_", " "))}</span>
+										</label>
+									))}
+								</div>
 							</div>
-						</div>
+						)}
 
-						<InputField label="Email" name="email" type="email" />
-						<InputField label="Password" name="password" type="password" />
-
+						<InputField label="Email" name="email" type="email" disabled={mode === "EDIT"} />
+						{mode === "CREATE" && <InputField label="Password" name="password" type="password" />}
 						{role === "artist" && <InputField label="Artist Name" name="name" />}
 
 						{role !== "artist" && <InputField label="First Name" name="first_name" />}

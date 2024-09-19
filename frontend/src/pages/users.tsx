@@ -53,6 +53,13 @@ const UsersPage: React.FC = () => {
 		triggerModal("User Details", <ViewUser user={selectedUser!} />);
 	};
 
+	const editUserModal = (selectedUser: UserWithDetails) => {
+		triggerModal(
+			`Edit  Details (${properCase(selectedUser.role.replace("_", " "))})`,
+			<NewUser mode="EDIT" onSuccess={closeAndRefetch} user={selectedUser} />
+		);
+	};
+
 	return (
 		<div className="flex flex-col h-full w-full items-center">
 			{modal}
@@ -96,9 +103,9 @@ const UsersPage: React.FC = () => {
 										>
 											<FaEye />
 										</button>
-										{/* TODO: Edit User Details */}
+
 										<button
-											onClick={() => {}}
+											onClick={() => editUserModal(user)}
 											className="p-2 rounded-md text-blue-500 hover:text-blue-600 hover:bg-blue-100 transition-all"
 										>
 											<FaPencil />
