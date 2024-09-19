@@ -1,8 +1,9 @@
 import Pagination from "components/pagination";
+import { properCase } from "helpers/properCase";
 import { useModal } from "hooks/useModal";
 import { useCallback, useEffect, useState } from "react";
 import { FaTrash } from "react-icons/fa";
-import { FaEye, FaPencil } from "react-icons/fa6";
+import { FaPencil } from "react-icons/fa6";
 import { DeleteSong } from "sections/delete-song";
 import { NewSong } from "sections/new-song";
 import { Song } from "services/songs";
@@ -84,15 +85,8 @@ const SongsPage: React.FC = () => {
 								<tr key={song.id} className="hover:bg-gray-50 transition-all">
 									<td className="px-6 py-2 text-sm text-gray-800">{song.title}</td>
 									<td className="px-6 py-2 text-sm text-gray-800">{song.album_name}</td>
-									<td className="px-6 py-2 text-sm text-gray-800">{song.genre}</td>
+									<td className="px-6 py-2 text-sm text-gray-800">{properCase(song.genre)}</td>
 									<td className="px-6 py-2 gap-4 flex justify-center items-center">
-										{/* TODO: View Song Details */}
-										<button
-											onClick={() => {}}
-											className="p-2 rounded-md text-blue-500 hover:text-blue-600 hover:bg-blue-100 transition-all"
-										>
-											<FaEye />
-										</button>
 										{/* TODO: Edit Song Details */}
 										<button
 											onClick={() => {}}

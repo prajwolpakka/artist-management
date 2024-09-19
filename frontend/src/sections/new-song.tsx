@@ -1,4 +1,5 @@
 import { ErrorMessage, Field, Form, Formik, FormikHelpers } from "formik";
+import { properCase } from "helpers/properCase";
 import AsyncSelect from "react-select/async";
 import { toast } from "react-toastify";
 import { createSong } from "services/songs";
@@ -92,7 +93,7 @@ export const NewSong: React.FC<NewSongProps> = (props) => {
 								{["rnb", "country", "classic", "rock", "jazz"].map((genreOption) => (
 									<label key={genreOption} className="flex items-center cursor-pointer space-x-2">
 										<Field type="radio" name="genre" value={genreOption} className="form-radio text-blue-500" />
-										<span>{genreOption}</span>
+										<span>{properCase(genreOption)}</span>
 									</label>
 								))}
 							</div>
