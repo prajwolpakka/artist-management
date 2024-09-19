@@ -68,11 +68,36 @@ export async function getUserById(id: number): Promise<User> {
 	return await db.from("user").where("user.id", id).first();
 }
 
-export const getUsers = (limit: number, offset: number, type?: "super_admin" | "artist_manager" | "artist") => {
-	let query = db("user").select("*").limit(limit).offset(offset);
-	if (type) {
-		query = query.where("role", type);
+export const getUsers = async (limit: number, offset: number, type?: "super_admin" | "artist_manager" | "artist") => {
+	let query = db("user").select("user.*").limit(limit).offset(offset);
+
+	// Join with artist or profile tables based on the type
+	if (type === "artist") {
+		query = query
+			.leftJoin("artist", "artist.user_id", "user.id")
+			.select("user.*", "artist.*", db.raw(`COALESCE(artist.updated_at, user.updated_at) as updated_at`));
+	} else if (type === "super_admin" || type === "artist_manager") {
+		query = query
+			.leftJoin("profile", "profile.user_id", "user.id")
+			.select("user.*", "profile.*", db.raw(`COALESCE(profile.updated_at, user.updated_at) as updated_at`));
+	} else {
+		// When no specific type is provided, join both artist and profile tables
+		query = query
+			.leftJoin("artist", "artist.user_id", "user.id")
+			.leftJoin("profile", "profile.user_id", "user.id")
+			.select(
+				"user.*",
+				"artist.*",
+				"profile.*",
+				db.raw(`COALESCE(artist.updated_at, profile.updated_at, user.updated_at) as updated_at`)
+			);
 	}
+
+	// Apply role filter if provided
+	if (type) {
+		query = query.where("user.role", type);
+	}
+
 	return query;
 };
 
