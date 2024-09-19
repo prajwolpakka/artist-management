@@ -60,7 +60,6 @@ const SongsPage: React.FC = () => {
 					Add Song
 				</button>
 			</div>
-
 			{loading ? (
 				<div className="flex justify-center items-center col-span-full h-48">
 					<div className="animate-spin border-4 border-t-transparent border-gray-300 rounded-full w-12 h-12"></div>
@@ -107,8 +106,7 @@ const SongsPage: React.FC = () => {
 					</table>
 				</div>
 			)}
-
-			<Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+			{totalPages > 1 && <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />}
 		</div>
 	);
 };
