@@ -6,11 +6,12 @@ import { FaTrash } from "react-icons/fa";
 import { FaEye, FaPencil } from "react-icons/fa6";
 import { DeleteUser } from "sections/delete-user";
 import { NewUser } from "sections/new-user";
-import { User } from "services/users";
+import { ViewUser } from "sections/view-user";
+import { UserWithDetails } from "types/user";
 import { http } from "../utils/http";
 
 const UsersPage: React.FC = () => {
-	const [users, setUsers] = useState<User[]>([]);
+	const [users, setUsers] = useState<UserWithDetails[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
 	const { modal, triggerModal, closeModal } = useModal();
 
@@ -44,8 +45,12 @@ const UsersPage: React.FC = () => {
 		triggerModal("Add User", <NewUser mode="CREATE" onSuccess={closeAndRefetch} />);
 	};
 
-	const deleteUserModal = (selectedUser: User) => {
+	const deleteUserModal = (selectedUser: UserWithDetails) => {
 		triggerModal("Delete User", <DeleteUser user={selectedUser!} onSuccess={closeAndRefetch} />);
+	};
+
+	const viewUserModal = (selectedUser: UserWithDetails) => {
+		triggerModal("User Details", <ViewUser user={selectedUser!} />);
 	};
 
 	return (
@@ -85,9 +90,8 @@ const UsersPage: React.FC = () => {
 									<td className="px-6 py-2 text-sm text-gray-800">{user.email}</td>
 									<td className="px-6 py-2 text-sm text-gray-800">{properCase(user.role.replace("_", " "))}</td>
 									<td className="px-6 py-2 gap-4 flex justify-center items-center">
-										{/* TODO: View User Details */}
 										<button
-											onClick={() => {}}
+											onClick={() => viewUserModal(user)}
 											className="p-2 rounded-md text-blue-500 hover:text-blue-600 hover:bg-blue-100 transition-all"
 										>
 											<FaEye />

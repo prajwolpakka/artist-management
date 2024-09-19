@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { deleteArtist } from "services/artists";
-import { UserArtist } from "services/users";
+import { UserArtist } from "types/user";
 
 interface Props {
 	artist: UserArtist;

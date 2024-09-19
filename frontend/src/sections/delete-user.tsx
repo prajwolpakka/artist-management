@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { deleteUser, User } from "services/users";
+import { deleteUser } from "services/users";
+import { User } from "types/user";
 
 interface Props {
 	user: User;

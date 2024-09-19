@@ -5,7 +5,7 @@ import { FaTrash } from "react-icons/fa";
 import { FaEye, FaPencil } from "react-icons/fa6";
 import { DeleteArtist } from "sections/delete-artist";
 import { NewArtist } from "sections/new-artist";
-import { UserArtist } from "services/users";
+import { UserArtist } from "types/user";
 import { http } from "../utils/http";
 
 const ArtistsPage: React.FC = () => {

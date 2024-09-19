@@ -1,5 +1,5 @@
+import { UserArtist } from "types/user";
 import { http } from "utils/http";
-import { UserArtist } from "./users";
 
 export async function createArtist(data: UserArtist) {
 	try {
