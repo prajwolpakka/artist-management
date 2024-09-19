@@ -50,12 +50,15 @@ const UsersPage: React.FC = () => {
 	};
 
 	const viewUserModal = (selectedUser: UserWithDetails) => {
-		triggerModal("User Details", <ViewUser user={selectedUser!} />);
+		triggerModal(
+			`User Details (${properCase(selectedUser.role.replace("_", " "))})`,
+			<ViewUser user={selectedUser!} />
+		);
 	};
 
 	const editUserModal = (selectedUser: UserWithDetails) => {
 		triggerModal(
-			`Edit  Details (${properCase(selectedUser.role.replace("_", " "))})`,
+			`Edit Details (${properCase(selectedUser.role.replace("_", " "))})`,
 			<NewUser mode="EDIT" onSuccess={closeAndRefetch} user={selectedUser} />
 		);
 	};
