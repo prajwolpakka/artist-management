@@ -1,16 +1,28 @@
 import { ErrorMessage, Field, Form, Formik, FormikHelpers } from "formik";
+import { formatDateTimeToYMD } from "helpers/format-date";
 import { properCase } from "helpers/properCase";
 import { toast } from "react-toastify";
-import { createArtist } from "services/artists";
-import { createArtistSchema } from "validators/users";
+import { createArtist, updateArtist } from "services/artists";
+import { UserArtist } from "types/user";
+import { createArtistSchema, updateArtistSchema } from "validators/users";
 
 export interface NewArtistProps {
 	mode: "EDIT" | "CREATE";
 	onSuccess: () => void;
-	artist?: any;
+	artist?: UserArtist;
 }
 
-const InputField = ({ label, name, type = "text" }: { label: string; name: string; type?: string }) => (
+const InputField = ({
+	label,
+	name,
+	type = "text",
+	disabled = false,
+}: {
+	label: string;
+	name: string;
+	type?: string;
+	disabled?: boolean;
+}) => (
 	<div>
 		<div className="flex items-center">
 			<label className="w-1/4 text-sm text-gray-700">{label}</label>
@@ -18,7 +30,10 @@ const InputField = ({ label, name, type = "text" }: { label: string; name: strin
 				<Field
 					name={name}
 					type={type}
-					className="w-full py-1 px-2 border border-gray-300 rounded-md focus:outline-blue-500"
+					disabled={disabled}
+					className={`w-full py-1 px-2 border border-gray-300 rounded-md focus:outline-blue-500 ${
+						disabled ? "bg-gray-100 cursor-not-allowed" : ""
+					}`}
 				/>
 			</div>
 		</div>
@@ -30,35 +45,45 @@ const InputField = ({ label, name, type = "text" }: { label: string; name: strin
 );
 
 export const NewArtist: React.FC<NewArtistProps> = (props) => {
-	const { mode, onSuccess } = props;
-
-	const validationSchema = createArtistSchema;
+	const { mode, artist, onSuccess } = props;
+	const validationSchema = mode === "CREATE" ? createArtistSchema : updateArtistSchema;
 
 	const handleSubmit = async (values: any, { setSubmitting }: FormikHelpers<any>) => {
-		const data = await createArtist(values);
+		console.log(values);
+		const data = mode === "CREATE" ? await createArtist(values) : await updateArtist(values, artist!.artist_id);
+
 		setSubmitting(false);
 		if (data.error) {
 			toast.error(data.error);
 		} else {
-			toast.success("Artist created successfully.");
+			toast.success(data.message);
 			onSuccess();
 		}
+	};
+
+	const defaultValues = {
+		gender: "m",
+		password: "",
+		role: "artist",
+		name: "",
+		dob: "",
+		address: "",
+		first_release_year: "",
+		no_of_albums_released: "",
+		email: "",
 	};
 
 	return (
 		<div className="flex flex-col items-center">
 			<Formik
-				initialValues={{
-					gender: "m",
-					role: "artist",
-				}}
+				initialValues={mode === "EDIT" ? { ...artist, dob: formatDateTimeToYMD(artist?.dob) } : defaultValues}
 				validationSchema={validationSchema}
 				onSubmit={handleSubmit}
 			>
 				{({ isSubmitting }) => (
 					<Form className="w-full grid grid-cols-1 gap-3">
-						<InputField label="Email" name="email" type="email" />
-						<InputField label="Password" name="password" type="password" />
+						<InputField label="Email" name="email" type="email" disabled={mode === "EDIT"} />
+						{mode === "CREATE" && <InputField label="Password" name="password" type="password" />}
 
 						<InputField label="Artist Name" name="name" />
 						<InputField label="Date of Birth" name="dob" type="date" />

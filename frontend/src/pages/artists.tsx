@@ -5,6 +5,7 @@ import { FaTrash } from "react-icons/fa";
 import { FaEye, FaPencil } from "react-icons/fa6";
 import { DeleteArtist } from "sections/delete-artist";
 import { NewArtist } from "sections/new-artist";
+import { ViewArtist } from "sections/view-artist";
 import { UserArtist } from "types/user";
 import { http } from "../utils/http";
 
@@ -45,6 +46,17 @@ const ArtistsPage: React.FC = () => {
 
 	const deleteArtistModal = (selectedArtist: UserArtist) => {
 		triggerModal("Delete Artist", <DeleteArtist artist={selectedArtist!} onSuccess={closeAndRefetch} />);
+	};
+
+	const viewArtistModal = (selectedArtist: UserArtist) => {
+		triggerModal("Artist Details", <ViewArtist artist={selectedArtist!} />);
+	};
+
+	const editArtistModal = (selectedArtist: UserArtist) => {
+		triggerModal(
+			"Edit Details (Artist)",
+			<NewArtist mode="EDIT" onSuccess={closeAndRefetch} artist={selectedArtist} />
+		);
 	};
 
 	return (
@@ -90,16 +102,14 @@ const ArtistsPage: React.FC = () => {
 									<td className="px-6 py-2 text-sm text-gray-800">{artist.first_release_year}</td>
 									<td className="px-6 py-2 text-sm text-gray-800">{artist.no_of_albums_released}</td>
 									<td className="px-6 py-2 gap-4 flex justify-center items-center">
-										{/* TODO: View Artist Details */}
 										<button
-											onClick={() => {}}
+											onClick={() => viewArtistModal(artist)}
 											className="p-2 rounded-md text-blue-500 hover:text-blue-600 hover:bg-blue-100 transition-all"
 										>
 											<FaEye />
 										</button>
-										{/* TODO: Edit Artist Details */}
 										<button
-											onClick={() => {}}
+											onClick={() => editArtistModal(artist)}
 											className="p-2 rounded-md text-blue-500 hover:text-blue-600 hover:bg-blue-100 transition-all"
 										>
 											<FaPencil />
