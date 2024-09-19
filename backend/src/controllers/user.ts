@@ -8,8 +8,10 @@ import { Artist } from "../types/artist";
 import { Profile } from "../types/profile";
 import { UserArtist, UserArtistManager, UserSuperAdmin } from "../types/user";
 import {
+	updateArtistManagerSchema,
 	updateArtistSchema,
 	updateSuperAdminSchema,
+	userArtistManagerSchema,
 	userArtistSchema,
 	userSuperAdminSchema,
 } from "../validators/users";
@@ -60,7 +62,8 @@ export async function createUser(
 	const { data } = req.body;
 	const { email, password, role } = data;
 
-	const schema = role === "artist" ? userArtistSchema : userSuperAdminSchema;
+	const schema =
+		role === "artist" ? userArtistSchema : role === "artist_manager" ? userArtistManagerSchema : userSuperAdminSchema;
 
 	try {
 		schema.parse(data);
@@ -129,6 +132,14 @@ export async function updateUser(
 		}
 
 		await updateArtist(id, data as Artist);
+	} else if (role === "artist_manager") {
+		try {
+			updateArtistManagerSchema.parse(data);
+		} catch (err) {
+			return res.status(400).send({ errors: err });
+		}
+
+		await updateProfile(id, data as Profile);
 	} else {
 		try {
 			updateSuperAdminSchema.parse(data);

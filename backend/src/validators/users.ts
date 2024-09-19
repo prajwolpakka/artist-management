@@ -29,3 +29,15 @@ const superAdminSchema = {
 };
 export const userSuperAdminSchema = z.object({ ...credentialsSchema, ...superAdminSchema });
 export const updateSuperAdminSchema = z.object({ ...superAdminSchema });
+
+const artistManagerSchema = {
+	role: z.literal("artist_manager"),
+	first_name: z.string().min(1, "First name required").max(255, "First name too long"),
+	last_name: z.string().min(1, "Last name required").max(255, "Last name too long"),
+	phone: z.string(),
+	dob: z.coerce.date(),
+	gender: z.enum(["m", "f", "o"]),
+	address: z.string().max(255, "Address too long"),
+};
+export const userArtistManagerSchema = z.object({ ...credentialsSchema, ...artistManagerSchema });
+export const updateArtistManagerSchema = z.object({ ...artistManagerSchema });

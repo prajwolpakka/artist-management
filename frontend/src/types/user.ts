@@ -1,7 +1,9 @@
+export type UserRole = "super_admin" | "artist_manager" | "artist";
+
 export interface User {
 	id: number;
 	email: string;
-	role: "super_admin" | "artist_manager" | "artist";
+	role: UserRole;
 }
 
 export interface UserSuperAdmin extends User {

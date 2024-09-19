@@ -61,3 +61,45 @@ export const createAdminSchema = Yup.object({
 export const updateAdminSchema = Yup.object({
 	...adminSchemaFields,
 });
+
+const artistManagerSchemaFields = {
+	dob: Yup.date()
+		.required("* Required")
+		.test("valid-year", "* Invalid year in date of birth", (value) => {
+			if (!value) return false;
+			const year = value.getFullYear();
+			return year >= 1900 && year <= new Date().getFullYear();
+		}),
+	gender: Yup.string().required("* Required"),
+	address: Yup.string().required("* Required"),
+	role: Yup.string().oneOf(["artist_manager"]).required("* Required"),
+	first_name: Yup.string().required("* Required"),
+	last_name: Yup.string().required("* Required"),
+	phone: Yup.string().required("* Required"),
+};
+
+export const createArtistManagerSchema = Yup.object({
+	...credentialsSchema,
+	...artistManagerSchemaFields,
+});
+
+export const updateArtistManagerSchema = Yup.object({
+	...adminSchemaFields,
+});
+
+const addSchemaByRole = {
+	artist: createArtistSchema,
+	artist_manager: createArtistManagerSchema,
+	super_admin: createAdminSchema,
+};
+
+const editSchemaByRole = {
+	artist: updateArtistSchema,
+	artist_manager: updateArtistManagerSchema,
+	super_admin: updateAdminSchema,
+};
+
+export const getValidationSchema = (role: "artist" | "artist_manager" | "super_admin", mode: "CREATE" | "EDIT") => {
+	const schemaMap = mode === "CREATE" ? addSchemaByRole : editSchemaByRole;
+	return schemaMap[role] || createAdminSchema;
+};

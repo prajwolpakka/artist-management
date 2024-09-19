@@ -4,8 +4,8 @@ import { properCase } from "helpers/properCase";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { createUser, updateUser } from "services/users";
-import { isUserArtist, UserWithDetails } from "types/user";
-import { createAdminSchema, createArtistSchema, updateAdminSchema, updateArtistSchema } from "validators/users";
+import { isUserArtist, UserRole, UserWithDetails } from "types/user";
+import { getValidationSchema } from "validators/users";
 
 export interface NewUserProps {
 	mode: "EDIT" | "CREATE";
@@ -47,19 +47,16 @@ const InputField = ({
 
 export const NewUser: React.FC<NewUserProps> = (props) => {
 	const { mode, onSuccess, user } = props;
-	const [role, setRole] = useState<string>(user?.role ?? "super_admin");
+	const [role, setRole] = useState<UserRole>(user?.role ?? "super_admin");
 
-	const addValidationSchema = role === "artist" ? createArtistSchema : createAdminSchema;
-	const editValidationSchema = role === "artist" ? updateArtistSchema : updateAdminSchema;
-
-	const validationSchema = mode === "CREATE" ? addValidationSchema : editValidationSchema;
+	const validationSchema = getValidationSchema(role, mode);
 
 	const defaultValues = {
 		role,
 		email: "",
 		password: "",
-		firstName: "",
-		lastName: "",
+		first_name: "",
+		last_name: "",
 		phone: "",
 		dob: "",
 		gender: "m",
@@ -87,7 +84,7 @@ export const NewUser: React.FC<NewUserProps> = (props) => {
 	// Handle role change
 	const handleRoleChange = (e: React.ChangeEvent<HTMLInputElement>, setFieldValue: any) => {
 		const { value } = e.target;
-		setRole(value);
+		setRole(value as UserRole);
 		setFieldValue("role", value);
 	};
 
