@@ -84,7 +84,7 @@ export const createArtistManagerSchema = Yup.object({
 });
 
 export const updateArtistManagerSchema = Yup.object({
-	...adminSchemaFields,
+	...artistManagerSchemaFields,
 });
 
 const addSchemaByRole = {
