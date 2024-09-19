@@ -33,3 +33,20 @@ export async function createNewAdmin(admin: Omit<Admin, "id" | "password">, hash
 		address: admin.address,
 	});
 }
+
+/**
+ * get the user by their ID
+ * @param id - ID of the user
+ * @returns The user with the given ID
+ */
+export async function getUserById(id: number): Promise<User> {
+	return await db.from("user").where("user.id", id).first();
+}
+
+export const getUsers = (limit: number, offset: number) => {
+	return db("user").select("*").limit(limit).offset(offset);
+};
+
+export const getTotalUsers = () => {
+	return db("user").count("* as total").first();
+};
