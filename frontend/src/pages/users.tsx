@@ -4,14 +4,10 @@ import { useModal } from "hooks/useModal";
 import { useCallback, useEffect, useState } from "react";
 import { FaTrash } from "react-icons/fa";
 import { FaEye, FaPencil } from "react-icons/fa6";
+import { DeleteUser } from "sections/delete-user";
 import { NewUser } from "sections/new-user";
+import { User } from "services/users";
 import { http } from "../utils/http";
-
-export interface User {
-	id: string;
-	email: string;
-	role: string;
-}
 
 const UsersPage: React.FC = () => {
 	const [users, setUsers] = useState<User[]>([]);
@@ -39,13 +35,17 @@ const UsersPage: React.FC = () => {
 		fetchUsers();
 	}, [currentPage, fetchUsers, limit]);
 
-	const handleAddUser = () => {
+	const closeAndRefetch = () => {
 		closeModal();
 		fetchUsers();
 	};
 
 	const addUserModal = () => {
-		triggerModal("Add User", <NewUser mode="CREATE" onSuccess={handleAddUser} />);
+		triggerModal("Add User", <NewUser mode="CREATE" onSuccess={closeAndRefetch} />);
+	};
+
+	const deleteUserModal = (selectedUser: User) => {
+		triggerModal("Delete User", <DeleteUser user={selectedUser!} onSuccess={closeAndRefetch} />);
 	};
 
 	return (
@@ -99,9 +99,8 @@ const UsersPage: React.FC = () => {
 										>
 											<FaPencil />
 										</button>
-										{/* TODO: Delete User */}
 										<button
-											onClick={() => {}}
+											onClick={() => deleteUserModal(user)}
 											className="p-2 rounded-md text-red-500 hover:text-red-600 hover:bg-red-100 transition-all"
 										>
 											<FaTrash />
