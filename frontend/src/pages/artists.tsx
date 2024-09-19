@@ -1,5 +1,4 @@
 import Pagination from "components/pagination";
-import { properCase } from "helpers/properCase";
 import { useModal } from "hooks/useModal";
 import { useCallback, useEffect, useState } from "react";
 import { FaTrash } from "react-icons/fa";
@@ -74,16 +73,22 @@ const ArtistsPage: React.FC = () => {
 					<table className="min-w-full border">
 						<thead className="sticky top-0 bg-gray-100 z-10">
 							<tr className="border-b">
-								<th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Email</th>
-								<th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Role</th>
+								<th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Name</th>
+								<th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Date of Birth</th>
+								<th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Address</th>
+								<th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">First Release Year</th>
+								<th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Total Albums Released</th>
 								<th className="px-6 py-3 text-center text-sm font-semibold text-gray-600">Actions</th>
 							</tr>
 						</thead>
 						<tbody className="divide-y overflow-y-auto">
 							{artists.map((artist) => (
 								<tr key={artist.id} className="hover:bg-gray-50 transition-all">
-									<td className="px-6 py-2 text-sm text-gray-800">{artist.email}</td>
-									<td className="px-6 py-2 text-sm text-gray-800">{properCase(artist.role.replace("_", " "))}</td>
+									<td className="px-6 py-2 text-sm text-gray-800">{artist.name}</td>
+									<td className="px-6 py-2 text-sm text-gray-800">{new Date(artist.dob).toLocaleDateString()}</td>
+									<td className="px-6 py-2 text-sm text-gray-800">{artist.address}</td>
+									<td className="px-6 py-2 text-sm text-gray-800">{artist.first_release_year}</td>
+									<td className="px-6 py-2 text-sm text-gray-800">{artist.no_of_albums_released}</td>
 									<td className="px-6 py-2 gap-4 flex justify-center items-center">
 										{/* TODO: View Artist Details */}
 										<button
