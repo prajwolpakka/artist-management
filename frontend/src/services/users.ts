@@ -3,7 +3,6 @@ import { http } from "utils/http";
 export interface User {
 	id: number;
 	email: string;
-	password: string;
 	role: "super_admin" | "artist_manager" | "artist";
 }
 
