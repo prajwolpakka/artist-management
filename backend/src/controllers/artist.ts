@@ -48,7 +48,7 @@ export const getArtists = async (req: Request, res: Response) => {
 	const offset = (page - 1) * limit;
 
 	try {
-		const [artists, totalResult] = await Promise.all([getUsers(limit, offset, "artist"), getTotalUsers()]);
+		const [artists, totalResult] = await Promise.all([getUsers(limit, offset, "artist"), getTotalUsers("artist")]);
 		res.json({
 			artists: maskPrivateUserData(artists),
 			pagination: {

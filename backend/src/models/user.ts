@@ -166,8 +166,15 @@ export const getUsers = async (limit: number, offset: number, type?: "super_admi
 	}
 };
 
-export const getTotalUsers = () => {
-	return db("user").count("* as total").first();
+export const getTotalUsers = async (role?: string): Promise<{ total: number }> => {
+	let query = db("user").count("* as total").first();
+
+	if (role) {
+		query = query.where("role", role);
+	}
+
+	const result = await query;
+	return result as { total: number };
 };
 
 /**
