@@ -177,6 +177,7 @@ export const getTotalUsers = () => {
  */
 export async function deleteUserById(id: string): Promise<boolean> {
 	await db.transaction(async (trx) => {
+		await trx("song").where("artist_id", id).del();
 		await trx("artist").where("user_id", id).del();
 		await trx("profile").where("user_id", id).del();
 
