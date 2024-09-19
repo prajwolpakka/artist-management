@@ -4,7 +4,7 @@ import DashboardPage from "pages/dashboard";
 import LoginPage from "pages/login";
 import SignupPage from "pages/signup";
 import UsersPage from "pages/users";
-import { FiMusic, FiUser } from "react-icons/fi"; // More relevant icons
+import { FiMusic, FiUser } from "react-icons/fi";
 import { Route, createBrowserRouter, createRoutesFromElements } from "react-router-dom";
 import { MustBeLoggedIn, MustNotBeLoggedIn } from "./guard";
 

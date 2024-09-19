@@ -1,8 +1,10 @@
 import Pagination from "components/pagination";
 import { properCase } from "helpers/properCase";
-import { useEffect, useState } from "react";
+import { useModal } from "hooks/useModal";
+import { useCallback, useEffect, useState } from "react";
 import { FaTrash } from "react-icons/fa";
 import { FaEye, FaPencil } from "react-icons/fa6";
+import { NewUser } from "sections/new-user";
 import { http } from "../utils/http";
 
 export interface User {
@@ -14,35 +16,45 @@ export interface User {
 const UsersPage: React.FC = () => {
 	const [users, setUsers] = useState<User[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
+	const { modal, triggerModal, closeModal } = useModal();
 
 	const [currentPage, setCurrentPage] = useState<number>(1);
 	const [totalPages, setTotalPages] = useState<number>(1);
 	const [limit] = useState<number>(10);
 
-	useEffect(() => {
-		const fetchUsers = async () => {
-			setLoading(true);
-			try {
-				const response = await http.get(`/users?page=${currentPage}&limit=${limit}`);
-				setUsers(response.data.users);
-				setTotalPages(Math.ceil(response.data.pagination.total / limit));
-			} catch (error) {
-				console.error(error);
-			} finally {
-				setLoading(false);
-			}
-		};
-
-		fetchUsers();
+	const fetchUsers = useCallback(async () => {
+		setLoading(true);
+		try {
+			const response = await http.get(`/users?page=${currentPage}&limit=${limit}`);
+			setUsers(response.data.users);
+			setTotalPages(Math.ceil(response.data.pagination.total / limit));
+		} catch (error) {
+			console.error(error);
+		} finally {
+			setLoading(false);
+		}
 	}, [currentPage, limit]);
+
+	useEffect(() => {
+		fetchUsers();
+	}, [currentPage, fetchUsers, limit]);
+
+	const handleAddUser = () => {
+		closeModal();
+		fetchUsers();
+	};
+
+	const addUserModal = () => {
+		triggerModal("Add User", <NewUser mode="CREATE" onSuccess={handleAddUser} />);
+	};
 
 	return (
 		<div className="flex flex-col h-full w-full items-center">
+			{modal}
 			<div className="flex w-full justify-between items-center h-[75px]">
 				<h1 className="text-2xl font-bold text-gray-700">Users</h1>
-				{/* TODO: Add User */}
 				<button
-					onClick={() => {}}
+					onClick={addUserModal}
 					className="rounded-md px-6 py-2 text-sm bg-blue-600 text-white hover:bg-blue-700 shadow-md"
 				>
 					Add User
