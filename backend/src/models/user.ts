@@ -182,3 +182,50 @@ export async function deleteUserById(id: string): Promise<boolean> {
 	});
 	return true;
 }
+
+const WHERE_NAMES = {
+	email: "user.email",
+	name: "artist.name",
+} as const;
+export type AllowableQuery = typeof WHERE_NAMES;
+
+/**
+ * Search for artists based on query parameters
+ * @param query - Search query object with fields to filter and search term
+ * @returns List of artists matching the query
+ */
+export async function searchUserArtists(query: Partial<Record<keyof AllowableQuery, string>> & { q: string }) {
+	const { q, ...filters } = query;
+
+	const queryBuilder = db("user")
+		.leftJoin("artist", "artist.user_id", "user.id")
+		.select(
+			"user.id",
+			"user.email",
+			"user.role",
+			"artist.name",
+			"artist.dob",
+			"artist.gender",
+			"artist.address",
+			"artist.first_release_year",
+			"artist.no_of_albums_released",
+			db.raw(`COALESCE(artist.updated_at, user.updated_at) as updated_at`)
+		)
+		.where("user.role", "artist");
+
+	if (q) {
+		// Search in `email` and `name` fields
+		queryBuilder.where(function () {
+			this.where("user.email", "like", `%${q}%`).orWhere("artist.name", "like", `%${q}%`);
+		});
+	}
+
+	Object.entries(filters).forEach(([key, value]) => {
+		const column = WHERE_NAMES[key as keyof AllowableQuery];
+		if (column) {
+			queryBuilder.andWhere(column, "like", `%${value}%`);
+		}
+	});
+
+	return await queryBuilder;
+}

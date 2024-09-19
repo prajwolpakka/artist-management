@@ -1,6 +1,14 @@
 import { Request, Response } from "express";
 import { AutheniticatedRequest } from "../middlewares/authentication";
-import { createNewUser, deleteUserById, getTotalUsers, getUserByEmail, getUserById, getUsers } from "../models/user";
+import {
+	createNewUser,
+	deleteUserById,
+	getTotalUsers,
+	getUserByEmail,
+	getUserById,
+	getUsers,
+	searchUserArtists,
+} from "../models/user";
 import { hashPassword } from "../services/encryption";
 import { UserArtist } from "../types/user";
 import { userArtistSchema } from "../validators/users";
@@ -78,3 +86,21 @@ export const deleteArtist = async (req: Request, res: Response) => {
 		res.status(500).send("Internal Server Error");
 	}
 };
+
+export async function searchArtists(req: Request, res: Response) {
+	const { query } = req;
+
+	try {
+		const searchQuery = query as { q?: string };
+
+		if (!searchQuery.q) {
+			return res.status(200).send([]);
+		}
+
+		const users = await searchUserArtists(searchQuery as any);
+		return res.status(200).send(maskPrivateUserData(users));
+	} catch (error) {
+		console.error("Error searching artists:", error);
+		return res.status(500).send({ error: "Internal Server Error" });
+	}
+}
