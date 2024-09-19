@@ -5,30 +5,48 @@ import LoginPage from "pages/login";
 import SignupPage from "pages/signup";
 import SongsPage from "pages/songs";
 import UsersPage from "pages/users";
-import { FiMusic, FiStar, FiUsers } from "react-icons/fi";
 import { Route, createBrowserRouter, createRoutesFromElements } from "react-router-dom";
-import { MustBeLoggedIn, MustNotBeLoggedIn } from "./guard";
+import { MustBeLoggedIn, MustNotBeLoggedIn } from "./authentication";
+import AuthorizationGuard from "./authorization";
+import { NotFound } from "components/not-found";
 
 export const router = createBrowserRouter(
 	createRoutesFromElements(
 		<>
 			<Route element={<MustBeLoggedIn />}>
-				<Route
-					path="/"
-					element={
-						<DashboardLayout
-							navItems={[
-								{ label: "Users", to: "/users", icon: <FiUsers size={20} /> },
-								{ label: "Artists", to: "/artists", icon: <FiStar size={20} /> },
-								{ label: "Songs", to: "/songs", icon: <FiMusic size={20} /> },
-							]}
-						/>
-					}
-				>
-					<Route index element={<DashboardPage />} />
-					<Route path="/users" element={<UsersPage />} />
-					<Route path="/artists" element={<ArtistsPage />} />
-					<Route path="/songs" element={<SongsPage />} />
+				<Route path="/" element={<DashboardLayout />}>
+					<Route
+						index
+						element={
+							<AuthorizationGuard requiredRole={"artist"}>
+								<DashboardPage />
+							</AuthorizationGuard>
+						}
+					/>
+					<Route
+						path="/users"
+						element={
+							<AuthorizationGuard requiredRole={"super_admin"}>
+								<UsersPage />
+							</AuthorizationGuard>
+						}
+					/>
+					<Route
+						path="/artists"
+						element={
+							<AuthorizationGuard requiredRole={"artist_manager"}>
+								<ArtistsPage />
+							</AuthorizationGuard>
+						}
+					/>
+					<Route
+						path="/songs"
+						element={
+							<AuthorizationGuard requiredRole={"artist"}>
+								<SongsPage />
+							</AuthorizationGuard>
+						}
+					/>
 				</Route>
 			</Route>
 
@@ -36,6 +54,8 @@ export const router = createBrowserRouter(
 				<Route path="/login" element={<LoginPage />} />
 				<Route path="/signup" element={<SignupPage />} />
 			</Route>
+
+			<Route path="*" element={<NotFound />} />
 		</>
 	)
 );
