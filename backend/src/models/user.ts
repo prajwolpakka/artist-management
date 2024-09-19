@@ -75,30 +75,12 @@ export const getUsers = async (limit: number, offset: number, type?: "super_admi
 	if (type === "artist") {
 		query = query
 			.leftJoin("artist", "artist.user_id", "user.id")
-			.select(
-				"user.*",
-				"artist.name",
-				"artist.dob",
-				"artist.gender",
-				"artist.address",
-				"artist.first_release_year",
-				"artist.no_of_albums_released",
-				db.raw(`COALESCE(artist.updated_at, user.updated_at) as updated_at`)
-			);
+			.select("user.*", "artist.*", db.raw(`COALESCE(artist.updated_at, user.updated_at) as updated_at`));
 		return query.where("user.role", type);
 	} else if (type === "super_admin" || type === "artist_manager") {
 		query = query
 			.leftJoin("profile", "profile.user_id", "user.id")
-			.select(
-				"user.*",
-				"profile.first_name",
-				"profile.last_name",
-				"profile.phone",
-				"profile.dob",
-				"profile.gender",
-				"profile.address",
-				db.raw(`COALESCE(profile.updated_at, user.updated_at) as updated_at`)
-			);
+			.select("user.*", "profile.*", db.raw(`COALESCE(profile.updated_at, user.updated_at) as updated_at`));
 		return query.where("user.role", type);
 	} else {
 		query = query
@@ -110,12 +92,14 @@ export const getUsers = async (limit: number, offset: number, type?: "super_admi
 				"user.role",
 				"user.created_at",
 				"user.updated_at",
+				"artist.id as artist_id",
 				"artist.name as artist_name",
 				"artist.dob as artist_dob",
 				"artist.gender as artist_gender",
 				"artist.address as artist_address",
 				"artist.first_release_year as artist_first_release_year",
 				"artist.no_of_albums_released as artist_no_of_albums_released",
+				"profile.id as profile_id",
 				"profile.first_name as profile_first_name",
 				"profile.last_name as profile_last_name",
 				"profile.phone as profile_phone",
@@ -138,6 +122,7 @@ export const getUsers = async (limit: number, offset: number, type?: "super_admi
 			if (user.role === "artist") {
 				return {
 					...baseUser,
+					artist_id: user.artist_id,
 					name: user.artist_name,
 					dob: user.artist_dob,
 					gender: user.artist_gender,
@@ -148,6 +133,7 @@ export const getUsers = async (limit: number, offset: number, type?: "super_admi
 			} else {
 				return {
 					...baseUser,
+					profile_id: user.profile_id,
 					first_name: user.profile_first_name,
 					last_name: user.profile_last_name,
 					phone: user.profile_phone,

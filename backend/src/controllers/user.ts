@@ -1,7 +1,11 @@
 import { Request, Response } from "express";
 import { AutheniticatedRequest } from "../middlewares/authentication";
+import { getArtistById, updateArtist } from "../models/artist";
+import { getProfileById, updateProfile } from "../models/profile";
 import { createNewUser, deleteUserById, getTotalUsers, getUserByEmail, getUsers } from "../models/user";
 import { hashPassword } from "../services/encryption";
+import { Artist } from "../types/artist";
+import { Profile } from "../types/profile";
 import { UserArtist, UserArtistManager, UserSuperAdmin } from "../types/user";
 import { userArtistManagerSchema, userArtistSchema, userSuperAdminSchema } from "../validators/users";
 
@@ -104,3 +108,33 @@ export const deleteUser = async (req: Request, res: Response) => {
 		res.status(500).send("Internal Server Error");
 	}
 };
+
+export async function updateUser(
+	req: AutheniticatedRequest<UserArtist | UserSuperAdmin | UserArtistManager>,
+	res: Response
+) {
+	const id = req.params.id;
+
+	if (!id) {
+		return res.status(400).send({ error: "ID is required" });
+	}
+
+	const { data } = req.body;
+	const { role } = data;
+
+	const userProfile = role === "artist" ? getArtistById(id) : await getProfileById(id);
+	if (!userProfile) {
+		return res.status(404).send({
+			error: "User not found",
+		});
+	}
+
+	if (role === "artist") {
+		await updateArtist(id, data as Artist);
+	} else {
+		await updateProfile(id, data as Profile);
+	}
+	return res.status(201).send({
+		message: "User updated successfully",
+	});
+}
