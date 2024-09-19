@@ -1,4 +1,5 @@
 import Pagination from "components/pagination";
+import { properCase } from "helpers/properCase";
 import { useEffect, useState } from "react";
 import { FaTrash } from "react-icons/fa";
 import { FaEye, FaPencil } from "react-icons/fa6";
@@ -70,7 +71,7 @@ const UsersPage: React.FC = () => {
 							{users.map((user) => (
 								<tr key={user.id} className="hover:bg-gray-50 transition-all">
 									<td className="px-6 py-2 text-sm text-gray-800">{user.email}</td>
-									<td className="px-6 py-2 text-sm text-gray-800">{user.role}</td>
+									<td className="px-6 py-2 text-sm text-gray-800">{properCase(user.role.replace("_", " "))}</td>
 									<td className="px-6 py-2 gap-4 flex justify-center items-center">
 										{/* TODO: View User Details */}
 										<button
