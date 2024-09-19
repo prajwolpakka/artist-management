@@ -6,7 +6,13 @@ const credentialsSchema = {
 };
 
 const artistSchemaFields = {
-	dob: Yup.date().required("* Required"),
+	dob: Yup.date()
+		.required("* Required")
+		.test("valid-year", "* Invalid Date", (value) => {
+			if (!value) return false;
+			const year = value.getFullYear();
+			return year >= 1900 && year <= new Date().getFullYear();
+		}),
 	gender: Yup.string().required("* Required"),
 	address: Yup.string().required("* Required"),
 	role: Yup.string().oneOf(["artist"]).required("* Required"),
@@ -32,7 +38,13 @@ export const updateArtistSchema = Yup.object({
 });
 
 const adminSchemaFields = {
-	dob: Yup.date().required("* Required"),
+	dob: Yup.date()
+		.required("* Required")
+		.test("valid-year", "* Invalid year in date of birth", (value) => {
+			if (!value) return false;
+			const year = value.getFullYear();
+			return year >= 1900 && year <= new Date().getFullYear();
+		}),
 	gender: Yup.string().required("* Required"),
 	address: Yup.string().required("* Required"),
 	role: Yup.string().oneOf(["super_admin"]).required("* Required"),

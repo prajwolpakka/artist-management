@@ -7,7 +7,12 @@ import { hashPassword } from "../services/encryption";
 import { Artist } from "../types/artist";
 import { Profile } from "../types/profile";
 import { UserArtist, UserArtistManager, UserSuperAdmin } from "../types/user";
-import { userArtistManagerSchema, userArtistSchema, userSuperAdminSchema } from "../validators/users";
+import {
+	updateArtistSchema,
+	updateSuperAdminSchema,
+	userArtistSchema,
+	userSuperAdminSchema,
+} from "../validators/users";
 
 export function maskPrivateUserData(user: any) {
 	function maskSingleUser(user: any) {
@@ -55,20 +60,7 @@ export async function createUser(
 	const { data } = req.body;
 	const { email, password, role } = data;
 
-	let schema;
-	switch (role) {
-		case "artist":
-			schema = userArtistSchema;
-			break;
-		case "super_admin":
-			schema = userSuperAdminSchema;
-			break;
-		case "artist_manager":
-			schema = userArtistManagerSchema;
-			break;
-		default:
-			return res.status(400).send({ error: "Invalid role" });
-	}
+	const schema = role === "artist" ? userArtistSchema : userSuperAdminSchema;
 
 	try {
 		schema.parse(data);
@@ -130,8 +122,20 @@ export async function updateUser(
 	}
 
 	if (role === "artist") {
+		try {
+			updateArtistSchema.parse(data);
+		} catch (err) {
+			return res.status(400).send({ errors: err });
+		}
+
 		await updateArtist(id, data as Artist);
 	} else {
+		try {
+			updateSuperAdminSchema.parse(data);
+		} catch (err) {
+			return res.status(400).send({ errors: err });
+		}
+
 		await updateProfile(id, data as Profile);
 	}
 	return res.status(201).send({
