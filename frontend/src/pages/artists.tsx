@@ -1,3 +1,4 @@
+import CSVExport from "components/export";
 import Pagination from "components/pagination";
 import { useModal } from "hooks/useModal";
 import { useCallback, useEffect, useState } from "react";
@@ -61,12 +62,17 @@ const ArtistsPage: React.FC = () => {
 			{modal}
 			<div className="flex w-full justify-between items-center h-[75px]">
 				<h1 className="text-2xl font-bold text-gray-700">Artists</h1>
-				<button
-					onClick={addArtistModal}
-					className="rounded-md px-6 py-2 text-sm bg-blue-600 text-white hover:bg-blue-700 shadow-md"
-				>
-					Add Artist
-				</button>
+
+				<div className="flex gap-2">
+					<CSVExport />
+
+					<button
+						onClick={addArtistModal}
+						className="rounded-md px-6 py-2 text-sm bg-blue-600 text-white hover:bg-blue-700 shadow-md"
+					>
+						Add Artist
+					</button>
+				</div>
 			</div>
 			{loading ? (
 				<div className="flex justify-center items-center col-span-full h-48">

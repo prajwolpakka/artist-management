@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { FiMusic, FiStar, FiUsers } from "react-icons/fi"; // Ensure icons are imported
+import { FiMusic, FiStar, FiUsers } from "react-icons/fi";
 import { useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
 import { AUTH_LEVEL } from "router/auth-level";
