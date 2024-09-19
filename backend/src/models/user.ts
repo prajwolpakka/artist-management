@@ -68,8 +68,12 @@ export async function getUserById(id: number): Promise<User> {
 	return await db.from("user").where("user.id", id).first();
 }
 
-export const getUsers = (limit: number, offset: number) => {
-	return db("user").select("*").limit(limit).offset(offset);
+export const getUsers = (limit: number, offset: number, type?: "super_admin" | "artist_manager" | "artist") => {
+	let query = db("user").select("*").limit(limit).offset(offset);
+	if (type) {
+		query = query.where("role", type);
+	}
+	return query;
 };
 
 export const getTotalUsers = () => {
