@@ -53,10 +53,7 @@ const ArtistsPage: React.FC = () => {
 	};
 
 	const editArtistModal = (selectedArtist: UserArtist) => {
-		triggerModal(
-			"Edit Details (Artist)",
-			<NewArtist mode="EDIT" onSuccess={closeAndRefetch} artist={selectedArtist} />
-		);
+		triggerModal("Edit Artist", <NewArtist mode="EDIT" onSuccess={closeAndRefetch} artist={selectedArtist} />);
 	};
 
 	return (
