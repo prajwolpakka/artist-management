@@ -1,5 +1,9 @@
 import { Request, Response } from "express";
-import { getTotalUsers, getUsers } from "../models/user";
+import { AutheniticatedRequest } from "../middlewares/authentication";
+import { createNewUser, getTotalUsers, getUserByEmail, getUsers } from "../models/user";
+import { hashPassword } from "../services/encryption";
+import { UserArtist, UserArtistManager, UserSuperAdmin } from "../types/user";
+import { userArtistManagerSchema, userArtistSchema, userSuperAdminSchema } from "../validators/users";
 
 export function maskPrivateUserData(user: any) {
 	function maskSingleUser(user: any) {
@@ -12,6 +16,12 @@ export function maskPrivateUserData(user: any) {
 	}
 	return maskSingleUser(user);
 }
+
+export const sendUserAlreadyExists = (res: Response) => {
+	return res.status(409).send({
+		error: "User already exists",
+	});
+};
 
 export const getUsersPage = async (req: Request, res: Response) => {
 	const page = parseInt(req.query.page as string) || 1;
@@ -33,3 +43,43 @@ export const getUsersPage = async (req: Request, res: Response) => {
 		res.status(500).send("Internal Server Error");
 	}
 };
+
+export async function createUser(
+	req: AutheniticatedRequest<Omit<UserArtist | UserSuperAdmin | UserArtistManager, "id">>,
+	res: Response
+) {
+	const { data } = req.body;
+	const { email, password, role } = data;
+
+	let schema;
+	switch (role) {
+		case "artist":
+			schema = userArtistSchema;
+			break;
+		case "super_admin":
+			schema = userSuperAdminSchema;
+			break;
+		case "artist_manager":
+			schema = userArtistManagerSchema;
+			break;
+		default:
+			return res.status(400).send({ error: "Invalid role" });
+	}
+
+	try {
+		schema.parse(data);
+	} catch (err) {
+		return res.status(400).send({ errors: err });
+	}
+
+	const existingUser = await getUserByEmail(email);
+	if (existingUser) {
+		return sendUserAlreadyExists(res);
+	}
+
+	const hashedPassword = hashPassword(password);
+	const user = await createNewUser(data, hashedPassword);
+	return res.status(201).send({
+		message: "User created successfully",
+	});
+}

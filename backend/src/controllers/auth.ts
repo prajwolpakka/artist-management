@@ -1,8 +1,9 @@
 import { Response } from "express";
-import { createNewAdmin, getUserByEmail } from "../models/user";
+import { createNewUser, getUserByEmail } from "../models/user";
 import { comparePassword, hashPassword, SignAccessToken } from "../services/encryption";
 import { TypedRequest } from "../types/common";
 import { loginSchema, signupSchema } from "../validators/authentication";
+import { sendUserAlreadyExists } from "./user";
 
 const sendInvalidCredentials = (res: Response) => {
 	return res.status(401).send({
@@ -13,12 +14,6 @@ const sendInvalidCredentials = (res: Response) => {
 const sendUnauthorized = (res: Response) => {
 	return res.status(401).send({
 		error: "Invalid password",
-	});
-};
-
-const sendUserAlreadyExists = (res: Response) => {
-	return res.status(409).send({
-		error: "User already exists",
 	});
 };
 
@@ -54,7 +49,7 @@ export async function signUp(req: TypedRequest<typeof signupSchema>, res: Respon
 	}
 
 	const hashedPassword = hashPassword(password);
-	await createNewAdmin({ ...rest, email, role: "super_admin" }, hashedPassword);
+	await createNewUser({ ...rest, email, role: "super_admin" }, hashedPassword);
 	return res.status(201).send({
 		message: "User created successfully",
 	});

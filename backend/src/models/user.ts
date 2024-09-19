@@ -1,5 +1,13 @@
 import { db } from "../db";
-import { Admin, User } from "../types/user";
+import {
+	isUserArtist,
+	isUserArtistManager,
+	isUserSuperAdmin,
+	User,
+	UserArtist,
+	UserArtistManager,
+	UserSuperAdmin,
+} from "../types/user";
 
 /**
  * Get the user by their email
@@ -11,27 +19,44 @@ export async function getUserByEmail(email: string): Promise<User | undefined> {
 }
 
 /**
- * Create a new admin
- * @param admin - User object with admin details
- * @param hashedPassword - The hashed password for the admin
+ * Create a new user
+ * @param user - User object with details
+ * @param hashedPassword - The hashed password for the user
  * @returns void
  */
-export async function createNewAdmin(admin: Omit<Admin, "id" | "password">, hashedPassword: string): Promise<void> {
+export async function createNewUser(
+	user: Omit<UserArtist | UserSuperAdmin | UserArtistManager, "id" | "password">,
+	hashedPassword: string
+): Promise<void> {
 	const [newUserId] = await db("user").insert({
-		email: admin.email,
-		role: admin.role,
+		email: user.email,
+		role: user.role,
 		password: hashedPassword,
 	});
 
-	await db("profile").insert({
-		user_id: newUserId,
-		first_name: admin.first_name,
-		last_name: admin.last_name,
-		phone: admin.phone,
-		dob: admin.dob,
-		gender: admin.gender,
-		address: admin.address,
-	});
+	if (isUserSuperAdmin(user) || isUserArtistManager(user)) {
+		await db("profile").insert({
+			user_id: newUserId,
+			first_name: user.first_name,
+			last_name: user.last_name,
+			phone: user.phone,
+			dob: user.dob,
+			gender: user.gender,
+			address: user.address,
+		});
+	}
+
+	if (isUserArtist(user)) {
+		await db("artist").insert({
+			user_id: newUserId,
+			name: user.name,
+			dob: user.dob,
+			gender: user.gender,
+			address: user.address,
+			first_release_year: user.first_release_year,
+			no_of_albums_released: user.no_of_albums_released,
+		});
+	}
 }
 
 /**
