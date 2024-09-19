@@ -85,7 +85,7 @@ export const getUsers = async (limit: number, offset: number, type?: "super_admi
 				"artist.no_of_albums_released",
 				db.raw(`COALESCE(artist.updated_at, user.updated_at) as updated_at`)
 			);
-		return query;
+		return query.where("user.role", type);
 	} else if (type === "super_admin" || type === "artist_manager") {
 		query = query
 			.leftJoin("profile", "profile.user_id", "user.id")
@@ -99,7 +99,7 @@ export const getUsers = async (limit: number, offset: number, type?: "super_admi
 				"profile.address",
 				db.raw(`COALESCE(profile.updated_at, user.updated_at) as updated_at`)
 			);
-		return query;
+		return query.where("user.role", type);
 	} else {
 		query = query
 			.leftJoin("artist", "artist.user_id", "user.id")
