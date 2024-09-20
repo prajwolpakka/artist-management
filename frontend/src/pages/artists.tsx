@@ -1,4 +1,5 @@
 import CSVExport from "components/export";
+import CSVImport from "components/import";
 import Pagination from "components/pagination";
 import { useModal } from "hooks/useModal";
 import { useCallback, useEffect, useState } from "react";
@@ -64,6 +65,7 @@ const ArtistsPage: React.FC = () => {
 				<h1 className="text-2xl font-bold text-gray-700">Artists</h1>
 
 				<div className="flex gap-2">
+					<CSVImport />
 					<CSVExport />
 
 					<button

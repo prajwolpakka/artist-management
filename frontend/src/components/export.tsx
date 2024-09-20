@@ -1,3 +1,4 @@
+import { formatDateTimeToYMD } from "helpers/format-date";
 import React, { useState } from "react";
 import { FiDownload } from "react-icons/fi";
 import { UserArtist } from "types/user";
@@ -20,14 +21,30 @@ const CSVExport: React.FC = () => {
 		}
 
 		const csvRows: string[] = [];
-		const headers = ["name", "email", "dob", "gender", "address", "first_release_year", "no_of_albums_released"].join(
-			","
-		);
+		const headers = [
+			"name",
+			"email",
+			"password",
+			"dob",
+			"gender",
+			"address",
+			"first_release_year",
+			"no_of_albums_released",
+		].join(",");
 		csvRows.push(headers);
 
 		for (const artist of artists) {
 			const { name, email, dob, gender, address, first_release_year, no_of_albums_released } = artist;
-			const values = [name, email, dob, gender, address, first_release_year, no_of_albums_released].join(",");
+			const values = [
+				name,
+				email,
+				"******",
+				formatDateTimeToYMD(dob),
+				gender,
+				address,
+				first_release_year,
+				no_of_albums_released,
+			].join(",");
 			csvRows.push(values);
 		}
 

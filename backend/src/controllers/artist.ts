@@ -134,3 +134,45 @@ export async function updateArtistData(req: AutheniticatedRequest<Artist>, res: 
 		message: "User updated successfully",
 	});
 }
+
+export async function createArtistInBulk(req: AutheniticatedRequest<Omit<UserArtist, "id">[]>, res: Response) {
+	const { data } = req.body;
+
+	let successCount = 0;
+	let failureCount = 0;
+	let alreadyExistingCount = 0;
+
+	for (const element of data) {
+		const { email, password, role } = element;
+
+		if (role !== "artist") {
+			failureCount++;
+			continue;
+		}
+
+		try {
+			userArtistSchema.parse(element);
+		} catch (err) {
+			console.log(err);
+			failureCount++;
+			continue;
+		}
+
+		const existingUser = await getUserByEmail(email);
+		if (existingUser) {
+			alreadyExistingCount++;
+			continue;
+		}
+
+		const hashedPassword = hashPassword(password);
+		await createNewUser(element, hashedPassword);
+		successCount++;
+	}
+
+	return res.status(201).send({
+		message: "Bulk Upload process completed",
+		successCount,
+		failureCount,
+		alreadyExistingCount,
+	});
+}

@@ -13,7 +13,7 @@ const artistSchemaFields = {
 			const year = value.getFullYear();
 			return year >= 1900 && year <= new Date().getFullYear();
 		}),
-	gender: Yup.string().required("* Required"),
+	gender: Yup.string().oneOf(["m", "f", "o"]).required("* Required"),
 	address: Yup.string().required("* Required"),
 	role: Yup.string().oneOf(["artist"]).required("* Required"),
 	name: Yup.string().required("* Required"),
@@ -45,7 +45,7 @@ const adminSchemaFields = {
 			const year = value.getFullYear();
 			return year >= 1900 && year <= new Date().getFullYear();
 		}),
-	gender: Yup.string().required("* Required"),
+	gender: Yup.string().oneOf(["m", "f", "o"]).required("* Required"),
 	address: Yup.string().required("* Required"),
 	role: Yup.string().oneOf(["super_admin"]).required("* Required"),
 	first_name: Yup.string().required("* Required"),
@@ -70,7 +70,7 @@ const artistManagerSchemaFields = {
 			const year = value.getFullYear();
 			return year >= 1900 && year <= new Date().getFullYear();
 		}),
-	gender: Yup.string().required("* Required"),
+	gender: Yup.string().oneOf(["m", "f", "o"]).required("* Required"),
 	address: Yup.string().required("* Required"),
 	role: Yup.string().oneOf(["artist_manager"]).required("* Required"),
 	first_name: Yup.string().required("* Required"),

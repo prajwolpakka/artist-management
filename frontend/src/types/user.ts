@@ -36,7 +36,7 @@ export interface UserArtist extends User {
 	gender: "m" | "f" | "o";
 	address: string;
 	first_release_year: number;
-	no_of_albums_released: string;
+	no_of_albums_released: number;
 }
 
 export type UserWithDetails = UserSuperAdmin | UserArtistManager | UserArtist;

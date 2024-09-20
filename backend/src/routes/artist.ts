@@ -1,5 +1,12 @@
 import { Router } from "express";
-import { createArtist, deleteArtist, getArtists, searchArtists, updateArtistData } from "../controllers/artist";
+import {
+	createArtist,
+	createArtistInBulk,
+	deleteArtist,
+	getArtists,
+	searchArtists,
+	updateArtistData,
+} from "../controllers/artist";
 import { requireAuthentication } from "../middlewares/authentication";
 import { AUTH_LEVEL, requireAuthLevel } from "../middlewares/authorization";
 
@@ -13,3 +20,5 @@ artistRouter.delete("/:id", deleteArtist);
 
 artistRouter.get("/search", searchArtists);
 artistRouter.post("/:id", updateArtistData);
+
+artistRouter.post("/upload/bulk", createArtistInBulk);
