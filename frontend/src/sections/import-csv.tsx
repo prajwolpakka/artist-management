@@ -7,6 +7,7 @@ import { createArtistSchema } from "validators/users";
 
 interface CSVImportModalProps {
 	csvData: string[][];
+	onSuccess: () => void;
 	onClose: () => void;
 }
 
@@ -21,7 +22,7 @@ const requiredKeys = [
 	"no_of_albums_released",
 ];
 
-const CSVImportModal: React.FC<CSVImportModalProps> = ({ csvData, onClose }) => {
+const CSVImportModal: React.FC<CSVImportModalProps> = ({ csvData, onSuccess, onClose }) => {
 	const headers: string[] = csvData[0].map((header) => header.trim());
 	const content: string[][] = csvData.slice(1).map((row) => row.map((value) => value.trim()));
 
@@ -93,6 +94,7 @@ const CSVImportModal: React.FC<CSVImportModalProps> = ({ csvData, onClose }) => 
 				failureCount: response.data.failureCount,
 				alreadyExistingCount: response.data.alreadyExistingCount,
 			});
+			onSuccess();
 			setCurrentStep(3);
 		} catch (error) {
 			console.error("Failed to add bulk artists:", error);

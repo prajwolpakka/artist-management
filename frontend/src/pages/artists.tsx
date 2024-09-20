@@ -5,6 +5,7 @@ import { useModal } from "hooks/useModal";
 import { useCallback, useEffect, useState } from "react";
 import { FaTrash } from "react-icons/fa";
 import { FaEye, FaPencil } from "react-icons/fa6";
+import { useNavigate } from "react-router-dom";
 import { DeleteArtist } from "sections/delete-artist";
 import { NewArtist } from "sections/new-artist";
 import { ViewArtist } from "sections/view-artist";
@@ -12,6 +13,8 @@ import { UserArtist } from "types/user";
 import { http } from "../utils/http";
 
 const ArtistsPage: React.FC = () => {
+	const navigate = useNavigate();
+
 	const [artists, setArtists] = useState<UserArtist[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
 	const { modal, triggerModal, closeModal } = useModal();
@@ -58,6 +61,10 @@ const ArtistsPage: React.FC = () => {
 		triggerModal("Edit Artist", <NewArtist mode="EDIT" onSuccess={closeAndRefetch} artist={selectedArtist} />);
 	};
 
+	const navigateToSongsPage = (id: number) => {
+		navigate(`/artists/${id}`);
+	};
+
 	return (
 		<div className="flex flex-col h-full w-full items-center">
 			{modal}
@@ -65,7 +72,7 @@ const ArtistsPage: React.FC = () => {
 				<h1 className="text-2xl font-bold text-gray-700">Artists</h1>
 
 				<div className="flex gap-2">
-					<CSVImport />
+					<CSVImport onSuccess={() => fetchArtists()} />
 					<CSVExport />
 
 					<button
@@ -89,7 +96,7 @@ const ArtistsPage: React.FC = () => {
 					<table className="min-w-full border">
 						<thead className="sticky top-0 bg-gray-100 z-10">
 							<tr className="border-b">
-								<th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Name</th>
+								<th className="px-6 py-3 text-left text-sm font-semibold text-gray-600 text-blu">Name</th>
 								<th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Email</th>
 								<th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Gender</th>
 								<th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">First Release Year</th>
@@ -100,7 +107,12 @@ const ArtistsPage: React.FC = () => {
 						<tbody className="divide-y overflow-y-auto">
 							{artists.map((artist) => (
 								<tr key={artist.id} className="hover:bg-gray-50 transition-all">
-									<td className="px-6 py-2 text-sm text-gray-800">{artist.name}</td>
+									<td
+										className="px-6 py-2 text-sm text-blue-500 hover:underline cursor-pointer"
+										onClick={() => navigateToSongsPage(artist.id)}
+									>
+										{artist.name}
+									</td>
 									<td className="px-6 py-2 text-sm text-gray-800">{artist.email}</td>
 									<td className="px-6 py-2 text-sm text-gray-800">
 										{artist.gender === "m" ? "Male" : artist.gender === "f" ? "Female" : "Other"}

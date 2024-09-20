@@ -25,21 +25,34 @@ export async function getSongById(id: number): Promise<Song | null> {
 }
 
 /**
- * Get a paginated list of songs
+ * Get a paginated list of songs, optionally filtered by artist_id
  * @param limit - Number of songs per page
  * @param offset - Offset for pagination
+ * @param artist_id - Optional artist ID to filter songs
  * @returns A list of songs
  */
-export const getSongs = async (limit: number, offset: number): Promise<Song[]> => {
-	return await db("song").select("*").limit(limit).offset(offset);
+export const getSongs = async (limit: number, offset: number, artist_id?: number): Promise<Song[]> => {
+	const query = db("song").select("*").limit(limit).offset(offset);
+
+	if (artist_id) {
+		query.where("artist_id", artist_id);
+	}
+
+	return await query;
 };
 
 /**
  * Get the total number of songs
  * @returns The total count of songs
  */
-export const getTotalSongs = async () => {
-	return await db("song").count("* as total").first();
+export const getTotalSongs = async (artist_id?: number) => {
+	let query = db("song").count("* as total").first();
+
+	if (artist_id) {
+		query = query.where("artist_id", artist_id);
+	}
+	const result = await query;
+	return result as { total: number };
 };
 
 /**
@@ -50,4 +63,13 @@ export const getTotalSongs = async () => {
 export async function deleteSongById(id: string): Promise<boolean> {
 	const result = await db("song").where("id", id).del();
 	return result > 0; // Return true if a row was deleted, false otherwise
+}
+
+export async function updateOneSong(id: number, data: Song) {
+	await db("song").where("id", id).update({
+		title: data.title,
+		album_name: data.album_name,
+		genre: data.genre,
+		updated_at: db.fn.now(),
+	});
 }

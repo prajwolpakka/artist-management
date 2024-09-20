@@ -3,7 +3,13 @@ import React, { useRef, useState } from "react";
 import { FiUpload } from "react-icons/fi";
 import CSVImportModal from "sections/import-csv";
 
-const ImportCSVButton: React.FC = () => {
+interface Props {
+	onSuccess: () => void;
+}
+
+const ImportCSVButton: React.FC<Props> = (props) => {
+	const { onSuccess } = props;
+
 	const [loading, setLoading] = useState<boolean>(false);
 	const { modal, triggerModal, closeModal } = useModal();
 
@@ -21,7 +27,7 @@ const ImportCSVButton: React.FC = () => {
 				const text = e.target?.result as string;
 				const rows = text.split("\n").map((row) => row.split(","));
 
-				triggerModal("Import CSV", <CSVImportModal csvData={rows} onClose={closeModal} />);
+				triggerModal("Import CSV", <CSVImportModal csvData={rows} onSuccess={onSuccess} onClose={closeModal} />);
 				setLoading(false);
 			};
 

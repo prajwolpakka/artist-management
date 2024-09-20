@@ -4,12 +4,20 @@ import { useModal } from "hooks/useModal";
 import { useCallback, useEffect, useState } from "react";
 import { FaTrash } from "react-icons/fa";
 import { FaPencil } from "react-icons/fa6";
+import { useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 import { DeleteSong } from "sections/delete-song";
 import { NewSong } from "sections/new-song";
 import { Song } from "services/songs";
+import { RootState } from "store/store";
+import { UserRole } from "types/user";
 import { http } from "../utils/http";
 
 const SongsPage: React.FC = () => {
+	const params = useParams();
+	const artist_id = params.id as number | undefined;
+	const role = (useSelector((state: RootState) => state.auth.role) as UserRole) || "artist";
+
 	const [songs, setSongs] = useState<Song[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
 	const { modal, triggerModal, closeModal } = useModal();
@@ -21,7 +29,10 @@ const SongsPage: React.FC = () => {
 	const fetchSongs = useCallback(async () => {
 		setLoading(true);
 		try {
-			const response = await http.get(`/songs?page=${currentPage}&limit=${limit}`);
+			const response =
+				role === "artist"
+					? await http.get(`/songs/self?page=${currentPage}&limit=${limit}`)
+					: await http.get(`/songs?artist_id=${artist_id}&page=${currentPage}&limit=${limit}`);
 			setSongs(response.data.songs);
 			setTotalPages(Math.ceil(response.data.pagination.total / limit));
 		} catch (error) {
@@ -29,7 +40,7 @@ const SongsPage: React.FC = () => {
 		} finally {
 			setLoading(false);
 		}
-	}, [currentPage, limit]);
+	}, [artist_id, currentPage, limit]);
 
 	useEffect(() => {
 		fetchSongs();
@@ -41,11 +52,15 @@ const SongsPage: React.FC = () => {
 	};
 
 	const addSongModal = () => {
-		triggerModal("Add Song", <NewSong mode="CREATE" onSuccess={closeAndRefetch} />);
+		triggerModal("Add Song", <NewSong mode="CREATE" onSuccess={closeAndRefetch} artist_id={artist_id} />);
 	};
 
 	const deleteSongModal = (selectedSong: Song) => {
 		triggerModal("Delete Song", <DeleteSong song={selectedSong!} onSuccess={closeAndRefetch} />);
+	};
+
+	const editSongModal = (selectedSong: Song) => {
+		triggerModal("Edit Song", <NewSong mode="EDIT" onSuccess={closeAndRefetch} song={selectedSong} />);
 	};
 
 	return (
@@ -86,9 +101,8 @@ const SongsPage: React.FC = () => {
 									<td className="px-6 py-2 text-sm text-gray-800">{song.album_name}</td>
 									<td className="px-6 py-2 text-sm text-gray-800">{properCase(song.genre)}</td>
 									<td className="px-6 py-2 gap-4 flex justify-center items-center">
-										{/* TODO: Edit Song Details */}
 										<button
-											onClick={() => {}}
+											onClick={() => editSongModal(song)}
 											className="p-2 rounded-md text-blue-500 hover:text-blue-600 hover:bg-blue-100 transition-all"
 										>
 											<FaPencil />

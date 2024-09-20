@@ -14,7 +14,7 @@ const AuthorizationGuard: React.FC<AuthorizationGuardProps> = ({ children, requi
 	const role = (useSelector((state: RootState) => state.auth.role) as UserRole) || "artist";
 
 	if (AUTH_LEVEL[role] < AUTH_LEVEL[requiredRole]) {
-		return <Navigate to="/not-found" replace />;
+		return <Navigate to="/login" replace />;
 	}
 
 	return <>{children}</>;

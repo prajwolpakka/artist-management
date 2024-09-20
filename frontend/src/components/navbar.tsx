@@ -2,7 +2,6 @@ import { ReactNode } from "react";
 import { FiMusic, FiStar, FiUsers } from "react-icons/fi";
 import { useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
-import { AUTH_LEVEL } from "router/auth-level";
 import { RootState } from "store/store";
 import { UserRole } from "types/user";
 import { className } from "../utils/classname";
@@ -11,7 +10,8 @@ export interface NavItem {
 	label: string;
 	to: string;
 	icon: ReactNode;
-	authLevel: UserRole;
+	minAuthLevel: UserRole;
+	maxAuthLevel: UserRole;
 }
 
 export const NavBar: React.FC = () => {
@@ -20,15 +20,27 @@ export const NavBar: React.FC = () => {
 	const location = useLocation();
 
 	const navItems: NavItem[] = [
-		{ label: "Users", to: "/users", icon: <FiUsers size={20} />, authLevel: "super_admin" },
-		{ label: "Artists", to: "/artists", icon: <FiStar size={20} />, authLevel: "artist_manager" },
-		{ label: "Songs", to: "/songs", icon: <FiMusic size={20} />, authLevel: "artist" },
+		{
+			label: "Users",
+			to: "/users",
+			icon: <FiUsers size={20} />,
+			minAuthLevel: "super_admin",
+			maxAuthLevel: "super_admin",
+		},
+		{
+			label: "Artists",
+			to: "/artists",
+			icon: <FiStar size={20} />,
+			minAuthLevel: "artist_manager",
+			maxAuthLevel: "super_admin",
+		},
+		{ label: "Songs", to: "/songs", icon: <FiMusic size={20} />, minAuthLevel: "artist", maxAuthLevel: "artist" },
 	];
 
 	return (
 		<div className="flex flex-col w-full gap-1 mt-1">
 			{navItems
-				.filter((item) => AUTH_LEVEL[item.authLevel] <= AUTH_LEVEL[role])
+				.filter((item) => role >= item.minAuthLevel && role <= item.maxAuthLevel)
 				.map((item, index) => (
 					<NavBarLink
 						key={index}

@@ -1,15 +1,17 @@
 import { ErrorMessage, Field, Form, Formik, FormikHelpers } from "formik";
 import { properCase } from "helpers/properCase";
-import AsyncSelect from "react-select/async";
+import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import { createSong } from "services/songs";
-import { http } from "utils/http";
+import { createSelfSong, createSong, Song, updateSong } from "services/songs";
+import { RootState } from "store/store";
+import { UserRole } from "types/user";
 import { songSchema } from "validators/songs";
 
 export interface NewSongProps {
 	mode: "EDIT" | "CREATE";
 	onSuccess: () => void;
-	song?: any;
+	artist_id?: number;
+	song?: Song;
 }
 
 const InputField = ({ label, name, type = "text" }: { label: string; name: string; type?: string }) => (
@@ -32,24 +34,32 @@ const InputField = ({ label, name, type = "text" }: { label: string; name: strin
 );
 
 export const NewSong: React.FC<NewSongProps> = (props) => {
-	const { mode, onSuccess, song } = props;
+	const role = (useSelector((state: RootState) => state.auth.role) as UserRole) || "artist";
+	const { mode, onSuccess, song, artist_id } = props;
 
 	const validationSchema = songSchema;
 
 	const handleSubmit = async (values: any, { setSubmitting }: FormikHelpers<any>) => {
-		const data = await createSong(values);
+		let data;
+		if (mode === "CREATE") {
+			if (role === "artist") {
+				data = await createSelfSong(values);
+			} else if (artist_id !== undefined) {
+				data = await createSong({ ...values, artist_id: Number(artist_id) });
+			} else {
+				throw new Error("Artist ID is missing for song creation.");
+			}
+		} else {
+			data = await updateSong(values, song!.id!);
+		}
+
 		setSubmitting(false);
 		if (data.error) {
 			toast.error(data.error);
 		} else {
-			toast.success(`${mode === "EDIT" ? "Song updated" : "Song created"} successfully.`);
+			toast.success(data.message);
 			onSuccess();
 		}
-	};
-
-	const fetchArtists = async (input: string) => {
-		const { data } = await http.get(`/artists/search?q=${input}`);
-		return data.map((item: any) => ({ value: item.id, label: item.name }));
 	};
 
 	return (
@@ -59,32 +69,12 @@ export const NewSong: React.FC<NewSongProps> = (props) => {
 					title: song?.title || "",
 					album_name: song?.album_name || "",
 					genre: song?.genre || "rnb",
-					artist_id: song?.artist_id || "",
 				}}
 				validationSchema={validationSchema}
 				onSubmit={handleSubmit}
 			>
-				{({ isSubmitting, setFieldValue }) => (
+				{({ isSubmitting }) => (
 					<Form className="w-full grid grid-cols-1 gap-3">
-						<div>
-							<div className="flex items-center">
-								<label className="w-1/4 text-sm text-gray-700">Artist</label>
-								<div className="w-3/4">
-									<AsyncSelect
-										name="artist_id"
-										defaultOptions
-										loadOptions={fetchArtists}
-										onChange={(data: any) => setFieldValue("artist_id", data.value)}
-										placeholder="Select Artist..."
-									/>
-								</div>
-							</div>
-							<div className="flex items-center">
-								<div className="w-1/4"></div>
-								<ErrorMessage name={"artist_id"} component="div" className="text-red-500 text-xs mt-1" />
-							</div>
-						</div>
-
 						<InputField label="Title" name="title" />
 						<InputField label="Album Name" name="album_name" type="text" />
 						<div className="flex items-center">

@@ -8,7 +8,6 @@ import UsersPage from "pages/users";
 import { Route, createBrowserRouter, createRoutesFromElements } from "react-router-dom";
 import { MustBeLoggedIn, MustNotBeLoggedIn } from "./authentication";
 import AuthorizationGuard from "./authorization";
-import { NotFound } from "components/not-found";
 
 export const router = createBrowserRouter(
 	createRoutesFromElements(
@@ -47,6 +46,14 @@ export const router = createBrowserRouter(
 							</AuthorizationGuard>
 						}
 					/>
+					<Route
+						path="/artists/:id"
+						element={
+							<AuthorizationGuard requiredRole={"artist"}>
+								<SongsPage />
+							</AuthorizationGuard>
+						}
+					/>
 				</Route>
 			</Route>
 
@@ -54,8 +61,6 @@ export const router = createBrowserRouter(
 				<Route path="/login" element={<LoginPage />} />
 				<Route path="/signup" element={<SignupPage />} />
 			</Route>
-
-			<Route path="*" element={<NotFound />} />
 		</>
 	)
 );
